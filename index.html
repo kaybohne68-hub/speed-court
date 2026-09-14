@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <title>Speed Court V1</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111827;
+      --panel2:#182235;
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --accent:#38bdf8;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --line:#334155;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#09111f,#0f172a);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .app{
+      width:min(760px,100%);
+      margin:0 auto;
+      padding:18px 16px 40px;
+    }
+    h1{font-size:clamp(28px,7vw,46px);margin:4px 0 2px}
+    .sub{color:var(--muted);margin-bottom:18px}
+    .card{
+      background:rgba(17,24,39,.94);
+      border:1px solid #243148;
+      border-radius:20px;
+      padding:16px;
+      margin:14px 0;
+      box-shadow:0 12px 40px rgba(0,0,0,.24);
+    }
+    label{display:block;font-weight:700;margin:14px 0 7px}
+    select,input[type="number"]{
+      width:100%;
+      padding:13px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#0f172a;
+      color:var(--text);
+      font-size:16px;
+    }
+    input[type="range"]{width:100%}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .pill{
+      background:#0f172a;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 12px;
+      color:var(--muted)
+    }
+    button{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:15px 18px;
+      font-size:18px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .primary{background:var(--accent);color:#07111d}
+    .secondary{background:#243148;color:white}
+    .danger{background:var(--danger);color:white}
+    .hidden{display:none !important}
+    .court-wrap{display:flex;justify-content:center}
+    .court{
+      position:relative;
+      width:min(92vw,420px);
+      aspect-ratio:610/1340;
+      border:4px solid #e2e8f0;
+      background:#125f45;
+      border-radius:8px;
+      overflow:hidden;
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.15);
+    }
+    .court:before{
+      content:"";
+      position:absolute;left:0;right:0;top:50%;
+      height:4px;background:#e2e8f0;
+      transform:translateY(-2px)
+    }
+    .center-line{
+      position:absolute;left:50%;top:0;bottom:0;width:3px;background:#e2e8f0;
+      transform:translateX(-1.5px)
+    }
+    .service1,.service2{
+      position:absolute;left:0;right:0;height:3px;background:#e2e8f0
+    }
+    .service1{top:24%}.service2{bottom:24%}
+    .target{
+      position:absolute;
+      width:64px;height:64px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;font-size:13px;text-align:center;
+      transform:translate(-50%,-50%);
+      background:rgba(15,23,42,.55);
+      border:3px solid rgba(255,255,255,.75);
+      transition:.15s;
+    }
+    .target.active{
+      background:#f8fafc;color:#0f172a;
+      transform:translate(-50%,-50%) scale(1.18);
+      box-shadow:0 0 32px rgba(255,255,255,.75)
+    }
+    .vl{left:25%;top:16%}.vr{left:75%;top:16%}
+    .ml{left:18%;top:50%}.mr{left:82%;top:50%}
+    .hl{left:25%;top:84%}.hr{left:75%;top:84%}
+    .player{
+      position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);
+      width:34px;height:34px;border-radius:50%;background:#fbbf24;
+      border:3px solid white;box-shadow:0 0 18px rgba(251,191,36,.7)
+    }
+    .big{
+      font-size:clamp(42px,14vw,84px);
+      font-weight:950;text-align:center;
+      margin:12px 0 2px;
+      letter-spacing:-2px
+    }
+    .direction{
+      font-size:clamp(30px,9vw,62px);
+      font-weight:950;text-align:center;
+      min-height:82px;
+      display:flex;align-items:center;justify-content:center
+    }
+    .meta{color:var(--muted);text-align:center;margin:8px 0}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .stat{background:#0f172a;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+    .stat b{display:block;font-size:26px}
+    .stat span{font-size:12px;color:var(--muted)}
+    .tiny{font-size:13px;color:var(--muted);line-height:1.45}
+    @media(max-width:520px){
+      .grid2,.stats{grid-template-columns:1fr}
+      .target{width:54px;height:54px;font-size:11px}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>🏸 Speed Court</h1>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1</div>
+    </header>
+
+    <section id="setup" class="card">
+      <h2>Training einstellen</h2>
+
+      <label for="mode">Modus</label>
+      <select id="mode">
+        <option value="footwork">6-Ecken Footwork</option>
+        <option value="sprint">Explosive Sprints</option>
+        <option value="split">Split-Step Reaktion</option>
+      </select>
+
+      <div class="grid2">
+        <div>
+          <label for="duration">Trainingsdauer</label>
+          <select id="duration">
+            <option value="30">30 Sekunden</option>
+            <option value="60" selected>60 Sekunden</option>
+            <option value="120">2 Minuten</option>
+            <option value="180">3 Minuten</option>
+          </select>
+        </div>
+        <div>
+          <label for="rounds">Runden</label>
+          <select id="rounds">
+            <option value="1">1</option>
+            <option value="3" selected>3</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label for="minDelay">Min. Pause: <span id="minVal">0.8</span>s</label>
+          <input id="minDelay" type="range" min="0.4" max="3.0" step="0.1" value="0.8">
+        </div>
+        <div>
+          <label for="maxDelay">Max. Pause: <span id="maxVal">2.2</span>s</label>
+          <input id="maxDelay" type="range" min="0.8" max="5.0" step="0.1" value="2.2">
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label for="rest">Rundenpause</label>
+          <select id="rest">
+            <option value="20">20 Sekunden</option>
+            <option value="30" selected>30 Sekunden</option>
+            <option value="45">45 Sekunden</option>
+            <option value="60">60 Sekunden</option>
+          </select>
+        </div>
+        <div>
+          <label for="signal">Signal</label>
+          <select id="signal">
+            <option value="voice" selected>Sprache + Bildschirm</option>
+            <option value="beep">Ton + Bildschirm</option>
+            <option value="screen">Nur Bildschirm</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin:16px 0">
+        <label style="margin:0;display:flex;gap:9px;align-items:center">
+          <input id="vibrate" type="checkbox" checked>
+          Vibration
+        </label>
+        <span class="pill">Offline nutzbar</span>
+      </div>
+
+      <button id="startBtn" class="primary">Training starten</button>
+      <p class="tiny">Tipp: Handy seitlich am Feld oder am Netzpfosten platzieren. In einer lauten Halle hilft ein Bluetooth-Lautsprecher.</p>
+    </section>
+
+    <section id="training" class="hidden">
+      <div class="card">
+        <div id="phase" class="meta">Bereit</div>
+        <div id="timer" class="big">60</div>
+        <div id="direction" class="direction">—</div>
+        <div id="roundText" class="meta">Runde 1 / 3</div>
+      </div>
+
+      <div class="card court-wrap">
+        <div class="court">
+          <div class="center-line"></div>
+          <div class="service1"></div>
+          <div class="service2"></div>
+          <div class="target vl" data-dir="vl">VORNE<br>LINKS</div>
+          <div class="target vr" data-dir="vr">VORNE<br>RECHTS</div>
+          <div class="target ml" data-dir="ml">MITTE<br>LINKS</div>
+          <div class="target mr" data-dir="mr">MITTE<br>RECHTS</div>
+          <div class="target hl" data-dir="hl">HINTEN<br>LINKS</div>
+          <div class="target hr" data-dir="hr">HINTEN<br>RECHTS</div>
+          <div class="player"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stats">
+          <div class="stat"><b id="cueCount">0</b><span>Signale</span></div>
+          <div class="stat"><b id="elapsed">0s</b><span>aktive Zeit</span></div>
+          <div class="stat"><b id="currentRound">1</b><span>Runde</span></div>
+        </div>
+        <div style="height:12px"></div>
+        <button id="stopBtn" class="danger">Training beenden</button>
+      </div>
+    </section>
+
+    <section id="results" class="card hidden">
+      <h2>Training beendet ✓</h2>
+      <div class="stats">
+        <div class="stat"><b id="resCues">0</b><span>Signale</span></div>
+        <div class="stat"><b id="resTime">0s</b><span>Trainingszeit</span></div>
+        <div class="stat"><b id="resRounds">0</b><span>Runden</span></div>
+      </div>
+      <p id="resBreakdown" class="tiny"></p>
+      <button id="againBtn" class="primary">Noch einmal</button>
+    </section>
+  </main>
+
+<script>
+const dirs = [
+  {id:"vl", label:"Vorne links"},
+  {id:"vr", label:"Vorne rechts"},
+  {id:"ml", label:"Links"},
+  {id:"mr", label:"Rechts"},
+  {id:"hl", label:"Hinten links"},
+  {id:"hr", label:"Hinten rechts"}
+];
+
+const $ = id => document.getElementById(id);
+let state = {
+  running:false, round:1, cues:0, roundCues:0,
+  counts:{vl:0,vr:0,ml:0,mr:0,hl:0,hr:0},
+  startTs:0, roundStartTs:0, endTs:0,
+  cueTimeout:null, timerInterval:null, restInterval:null
+};
+
+$("minDelay").oninput = e => $("minVal").textContent = e.target.value;
+$("maxDelay").oninput = e => $("maxVal").textContent = e.target.value;
+
+function speak(text){
+  if ($("signal").value !== "voice") return;
+  if (!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "de-DE";
+  u.rate = 1.1;
+  speechSynthesis.speak(u);
+}
+
+function beep(){
+  if ($("signal").value !== "beep") return;
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = 880;
+    gain.gain.value = 0.15;
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start();
+    setTimeout(()=>{osc.stop();ctx.close()},120);
+  }catch(e){}
+}
+
+function vibrate(pattern=80){
+  if ($("vibrate").checked && navigator.vibrate) navigator.vibrate(pattern);
+}
+
+function clearActive(){
+  document.querySelectorAll(".target").forEach(x=>x.classList.remove("active"));
+}
+
+function chooseDirection(){
+  return dirs[Math.floor(Math.random()*dirs.length)];
+}
+
+function randomDelay(){
+  let a = parseFloat($("minDelay").value);
+  let b = parseFloat($("maxDelay").value);
+  if (b < a) [a,b] = [b,a];
+  return (a + Math.random()*(b-a))*1000;
+}
+
+function cue(){
+  if (!state.running) return;
+  if (Date.now() >= state.endTs) return finishRound();
+
+  const mode = $("mode").value;
+  if (mode === "split"){
+    $("phase").textContent = "Split-Step!";
+    $("direction").textContent = "SPLIT!";
+    clearActive();
+    beep();
+    vibrate(50);
+    setTimeout(()=>{
+      if (!state.running || Date.now() >= state.endTs) return;
+      doDirection();
+    }, 150 + Math.random()*250);
+  } else {
+    doDirection();
+  }
+}
+
+function doDirection(){
+  const d = chooseDirection();
+  clearActive();
+  const el = document.querySelector(`[data-dir="${d.id}"]`);
+  if(el) el.classList.add("active");
+  $("direction").textContent = d.label.toUpperCase();
+  $("phase").textContent = "LOS!";
+  state.cues++;
+  state.roundCues++;
+  state.counts[d.id]++;
+  $("cueCount").textContent = state.cues;
+  speak(d.label);
+  beep();
+  vibrate(90);
+
+  let nextDelay = randomDelay();
+  if ($("mode").value === "sprint") nextDelay = Math.max(nextDelay, 2200);
+  state.cueTimeout = setTimeout(cue, nextDelay);
+}
+
+function startTraining(){
+  if (parseFloat($("maxDelay").value) < parseFloat($("minDelay").value)){
+    $("maxDelay").value = $("minDelay").value;
+    $("maxVal").textContent = $("minDelay").value;
+  }
+
+  state = {
+    running:true, round:1, cues:0, roundCues:0,
+    counts:{vl:0,vr:0,ml:0,mr:0,hl:0,hr:0},
+    startTs:Date.now(), roundStartTs:0, endTs:0,
+    cueTimeout:null, timerInterval:null, restInterval:null
+  };
+
+  $("setup").classList.add("hidden");
+  $("results").classList.add("hidden");
+  $("training").classList.remove("hidden");
+  $("cueCount").textContent = "0";
+  $("currentRound").textContent = "1";
+  countdownThenRound();
+}
+
+function countdownThenRound(){
+  let n=3;
+  $("phase").textContent = "Start in";
+  $("direction").textContent = n;
+  $("timer").textContent = $("duration").value;
+  const c = setInterval(()=>{
+    n--;
+    if(n>0){
+      $("direction").textContent=n;
+      beep(); vibrate(35);
+    }else{
+      clearInterval(c);
+      startRound();
+    }
+  },1000);
+}
+
+function startRound(){
+  if(!state.running) return;
+  state.roundStartTs = Date.now();
+  const dur = parseInt($("duration").value,10)*1000;
+  state.endTs = state.roundStartTs + dur;
+  $("phase").textContent = "Training";
+  $("roundText").textContent = `Runde ${state.round} / ${$("rounds").value}`;
+  $("currentRound").textContent = state.round;
+  $("direction").textContent = "BEREIT";
+  state.roundCues=0;
+
+  clearInterval(state.timerInterval);
+  state.timerInterval=setInterval(()=>{
+    const remain=Math.max(0, Math.ceil((state.endTs-Date.now())/1000));
+    $("timer").textContent=remain;
+    $("elapsed").textContent=Math.floor((Date.now()-state.startTs)/1000)+"s";
+    if(remain<=0) finishRound();
+  },200);
+
+  state.cueTimeout=setTimeout(cue,700);
+}
+
+function finishRound(){
+  clearTimeout(state.cueTimeout);
+  clearInterval(state.timerInterval);
+  clearActive();
+  if(!state.running) return;
+
+  const totalRounds=parseInt($("rounds").value,10);
+  if(state.round>=totalRounds){
+    finishTraining();
+    return;
+  }
+
+  state.round++;
+  let remain=parseInt($("rest").value,10);
+  $("phase").textContent="Rundenpause";
+  $("direction").textContent="ERHOLEN";
+  $("timer").textContent=remain;
+  $("roundText").textContent=`Nächste Runde: ${state.round} / ${totalRounds}`;
+
+  clearInterval(state.restInterval);
+  state.restInterval=setInterval(()=>{
+    remain--;
+    $("timer").textContent=remain;
+    if(remain<=0){
+      clearInterval(state.restInterval);
+      countdownThenRound();
+    }
+  },1000);
+}
+
+function stopAll(){
+  clearTimeout(state.cueTimeout);
+  clearInterval(state.timerInterval);
+  clearInterval(state.restInterval);
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+}
+
+function finishTraining(){
+  if(!state.running) return;
+  state.running=false;
+  stopAll();
+  clearActive();
+  $("training").classList.add("hidden");
+  $("results").classList.remove("hidden");
+
+  const activeSeconds = parseInt($("duration").value,10) *
+    Math.min(state.round, parseInt($("rounds").value,10));
+
+  $("resCues").textContent=state.cues;
+  $("resTime").textContent=activeSeconds+"s";
+  $("resRounds").textContent=Math.min(state.round, parseInt($("rounds").value,10));
+
+  const names={vl:"Vorne links",vr:"Vorne rechts",ml:"Links",mr:"Rechts",hl:"Hinten links",hr:"Hinten rechts"};
+  $("resBreakdown").innerHTML = Object.entries(state.counts)
+    .map(([k,v])=>`${names[k]}: <b>${v}</b>`)
+    .join(" · ");
+
+  const history = JSON.parse(localStorage.getItem("speedCourtHistory") || "[]");
+  history.push({
+    date:new Date().toISOString(),
+    mode:$("mode").value,
+    cues:state.cues,
+    rounds:Math.min(state.round, parseInt($("rounds").value,10)),
+    duration:activeSeconds
+  });
+  localStorage.setItem("speedCourtHistory", JSON.stringify(history.slice(-30)));
+}
+
+$("startBtn").onclick=startTraining;
+$("stopBtn").onclick=finishTraining;
+$("againBtn").onclick=()=>{
+  $("results").classList.add("hidden");
+  $("setup").classList.remove("hidden");
+};
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
