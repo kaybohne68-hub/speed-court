@@ -1,4 +1,4 @@
-# Speed Court V1.5
+# Speed Court V1.6
 
 Badminton Sprint- und Footwork-Trainer als kleine Progressive Web App.
 
@@ -63,3 +63,13 @@ Hinweis: Sprachansage nutzt die im Browser vorhandene deutsche Text-to-Speech-St
 - Ansage „Training beendet.“
 - Abschlussanzeige „GESCHAFFT ✓“ mit Vibrations-/Tonsignal
 - Ergebnisbildschirm erscheint erst nach Ende der Ansage und mindestens 2,2 Sekunden
+
+
+## Neu in V1.6
+- Echter HTML-Medien-Audiokanal für Bluetooth-Kopfhörer und Bluetooth-Lautsprecher
+- Button „Bluetooth / Audio testen“
+- Medien-Signaltöne für Richtung, Pause, Bereit und Trainingsende
+- Audio wird beim Tippen auf „Training starten“ für mobile Browser freigeschaltet
+- Audiodateien werden für Offline-Betrieb mit gecacht
+
+Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. Die neuen WAV-Signale laufen dagegen über den normalen Medienkanal und dienen auch als zuverlässiger Bluetooth-Routing-Test.

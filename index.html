@@ -151,7 +151,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.5</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.6</div>
     </header>
 
     <section id="setup" class="card">
@@ -238,6 +238,7 @@
         <span class="pill">Offline nutzbar</span>
       </div>
 
+      <button id="audioTestBtn" class="secondary" style="margin-bottom:10px">🎧 Bluetooth / Audio testen</button>
       <button id="startBtn" class="primary">Training starten</button>
       <p class="tiny">Tipp: Handy seitlich am Feld oder am Netzpfosten platzieren. In einer lauten Halle hilft ein Bluetooth-Lautsprecher.</p>
     </section>
@@ -299,6 +300,41 @@ const dirs = [
 ];
 
 const $ = id => document.getElementById(id);
+const mediaAudio = new Audio();
+mediaAudio.preload = "auto";
+mediaAudio.playsInline = true;
+
+function playMediaCue(kind="cue"){
+  // Real media playback (not speechSynthesis): phones normally route this
+  // through the selected media output, including Bluetooth headphones/speakers.
+  const src = kind === "finish" ? "audio/finish.wav" :
+              kind === "ready"  ? "audio/ready.wav" :
+              kind === "pause"  ? "audio/pause.wav" :
+                                  "audio/cue.wav";
+  try{
+    mediaAudio.pause();
+    mediaAudio.currentTime = 0;
+    mediaAudio.src = src;
+    return mediaAudio.play().catch(()=>{});
+  }catch(e){}
+}
+
+function unlockMediaAudio(){
+  // Called directly from a user tap to unlock media playback on mobile browsers.
+  try{
+    mediaAudio.src = "audio/unlock.wav";
+    mediaAudio.volume = 0.01;
+    const pr = mediaAudio.play();
+    if(pr && pr.then){
+      pr.then(()=>{
+        mediaAudio.pause();
+        mediaAudio.currentTime = 0;
+        mediaAudio.volume = 1;
+      }).catch(()=>{ mediaAudio.volume = 1; });
+    }
+  }catch(e){}
+}
+
 let state = {
   running:false, round:1, cues:0, roundCues:0,
   counts:{vl:0,vr:0,ml:0,mr:0,hl:0,hr:0},
@@ -410,6 +446,7 @@ function cue(){
 }
 
 function doDirection(){
+  playMediaCue("cue");
   const d = chooseDirection();
   clearActive();
   const el = document.querySelector(`[data-dir="${d.id}"]`);
@@ -430,6 +467,7 @@ function doDirection(){
 }
 
 function startTraining(){
+  unlockMediaAudio();
   if (parseFloat($("maxDelay").value) < parseFloat($("minDelay").value)){
     $("maxDelay").value = $("minDelay").value;
     $("maxVal").textContent = $("minDelay").value;
@@ -507,12 +545,14 @@ function startRound(){
 }
 
 function announcePause(seconds){
+  playMediaCue("pause");
   $("phase").textContent = "Pause";
   $("direction").textContent = `PAUSE – ${seconds} SEK.`;
   speak(`Pause. ${seconds} Sekunden.`, true);
 }
 
 function announceReadyAndCountdown(){
+  playMediaCue("ready");
   $("phase").textContent = "Nächste Runde";
   $("direction").textContent = "BEREIT MACHEN";
   speak("Bereit machen. Nächste Runde.", true);
@@ -581,6 +621,7 @@ function finishTraining(){
   $("roundText").textContent = "Training abgeschlossen";
 
   clearSpeech();
+  playMediaCue("finish");
   speak("Training beendet.", true);
   beep();
   vibrate([120,80,120]);
@@ -629,6 +670,17 @@ function finishTraining(){
     showResults();
   },5000);
 }
+
+$("audioTestBtn").onclick=()=>{
+  try{
+    mediaAudio.pause();
+    mediaAudio.currentTime=0;
+    mediaAudio.volume=1;
+    mediaAudio.src="audio/test.wav";
+    mediaAudio.play();
+  }catch(e){}
+  setTimeout(()=>speak("Speed Court. Audio Test.", true), 250);
+};
 
 $("startBtn").onclick=startTraining;
 $("stopBtn").onclick=finishTraining;
