@@ -152,7 +152,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.9.1</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.9.2</div>
     </header>
 
     <section id="setup" class="card">
@@ -563,13 +563,20 @@ function doDirection(){
       clearActive();
       vibrate([30,30,30]);
 
-      // Erst NACH der vollständigen Rückkehr ins Zentrum beginnt die Pause.
+      // Saubere Audio-Sequenz:
+      // Der Zentrumston aus V1.8.18 dauert 1,5 Sekunden.
+      // Erst NACH seinem vollständigen Ende beginnt die Zufallspause.
+      // Dadurch kann die nächste Richtungsansage den Zentrumston nicht überlappen.
+      const centerSoundMs = 1500;
       const reactionPause = lo + Math.random() * (hi - lo);
       state.nextTimeout = setTimeout(()=>{
         if (!state.running || Date.now() >= state.endTs) return;
-        $("phase").textContent = "Training";
-        cue();
-      }, reactionPause);
+        state.nextTimeout = setTimeout(()=>{
+          if (!state.running || Date.now() >= state.endTs) return;
+          $("phase").textContent = "Training";
+          cue();
+        }, reactionPause);
+      }, centerSoundMs);
     }, centerMs);
   }, targetMs);
 }

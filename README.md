@@ -207,3 +207,11 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Beim laufenden Training bleibt das Feld die Hauptanzeige.
 - Rücklaufzeit wird je nach Zielposition individuell berechnet.
 - Die Zufallspause startet erst nach vollständiger Rückkehr ins Zentrum.
+
+## V1.9.2
+- Audio-Sequenz sauber verriegelt.
+- Positionston und Zentrumston bleiben unverändert aus V1.8.18.
+- Nach dem Zentrum wartet die App zuerst die kompletten 1,5 Sekunden des Zentrumstons ab.
+- Erst danach beginnt die eingestellte Zufallspause.
+- Erst nach dieser Pause folgt die nächste Richtungsansage.
+- Feldansicht und individuelle Rücklaufzeiten aus V1.9.1 bleiben unverändert.
