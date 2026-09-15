@@ -1,4 +1,4 @@
-# Speed Court V1.8.10
+# Speed Court V1.8.11
 
 Badminton Sprint- und Footwork-Trainer als kleine Progressive Web App.
 
@@ -151,4 +151,11 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 ## Neu in V1.8.10
 - Position erreicht: kurzer tiefer BUM (unverändert).
 - Zentrum erreicht: kurzer klarer BEEP.
+- Sprachansagen, Timing, Trainingslogik und Spielerprofile bleiben unverändert.
+
+## Neu in V1.8.11
+- Position: neu abgestimmter kurzer, trockener BUM mit klarer Attacke.
+- Zentrum: deutlich höherer, sauberer 2,65-kHz-BEEP.
+- Stärkere akustische Trennung zwischen beiden Trainingssignalen.
+- Keine aggressive Kompression, kein Doppelimpuls und kein Nachhall.
 - Sprachansagen, Timing, Trainingslogik und Spielerprofile bleiben unverändert.
