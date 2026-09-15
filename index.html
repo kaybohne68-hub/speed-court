@@ -151,7 +151,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.2</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.3</div>
     </header>
 
     <section id="setup" class="card">
@@ -309,21 +309,51 @@ let state = {
 $("minDelay").oninput = e => $("minVal").textContent = e.target.value;
 $("maxDelay").oninput = e => $("maxVal").textContent = e.target.value;
 
-function speak(text, force=false){
-  if (!force && $("signal").value !== "voice") return;
-  if (!("speechSynthesis" in window)) return;
+let speechQueue = [];
+let speechBusy = false;
+
+function processSpeechQueue(){
+  if (speechBusy || speechQueue.length === 0) return;
+  if (!("speechSynthesis" in window)) {
+    speechQueue = [];
+    return;
+  }
+  const item = speechQueue.shift();
+  speechBusy = true;
   try{
     const synth = window.speechSynthesis;
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(text);
+    const u = new SpeechSynthesisUtterance(item.text);
     u.lang = "de-DE";
     u.rate = 1.0;
     const voices = synth.getVoices();
     const de = voices.find(v => /^de(-|_)/i.test(v.lang)) ||
                voices.find(v => /deutsch|german/i.test(v.name));
     if (de) u.voice = de;
+    const done = () => {
+      speechBusy = false;
+      setTimeout(processSpeechQueue, 100);
+    };
+    u.onend = done;
+    u.onerror = done;
     synth.speak(u);
-  }catch(e){}
+  }catch(e){
+    speechBusy = false;
+    setTimeout(processSpeechQueue, 100);
+  }
+}
+
+function speak(text, force=false){
+  if (!force && $("signal").value !== "voice") return;
+  speechQueue.push({text});
+  processSpeechQueue();
+}
+
+function clearSpeech(){
+  speechQueue = [];
+  speechBusy = false;
+  if ("speechSynthesis" in window) {
+    try { speechSynthesis.cancel(); } catch(e) {}
+  }
 }
 
 function beep(){
@@ -426,14 +456,14 @@ function countdownThenRound(){
   $("direction").textContent = n;
   $("timer").textContent = $("duration").value;
 
-  if ("speechSynthesis" in window) {
-    try {
-      speechSynthesis.resume();
-      speechSynthesis.getVoices();
-    } catch(e) {}
-  }
+  clearSpeech();
 
-  speak(String(n), true);
+  // Spoken as one utterance, so mobile TTS cannot overlap individual numbers.
+  const words = [];
+  for(let i=n; i>=1; i--) words.push(String(i));
+  words.push("Los!");
+  speak(words.join(". ") , true);
+
   beep();
   vibrate(35);
 
@@ -445,14 +475,12 @@ function countdownThenRound(){
     n--;
     if(n > 0){
       $("direction").textContent = n;
-      speak(String(n), true);
       beep();
       vibrate(35);
     }else{
       clearInterval(c);
       $("direction").textContent = "LOS!";
       $("phase").textContent = "Los!";
-      speak("Los!", true);
       beep();
       vibrate([80,50,120]);
       setTimeout(startRound, 650);
@@ -493,8 +521,18 @@ function announceReadyAndCountdown(){
   $("direction").textContent = "BEREIT MACHEN";
   speak("Bereit machen. Nächste Runde.", true);
   setTimeout(()=>{
-    if(state.running) countdownThenRound();
-  }, 1800);
+    if(state.running && !speechBusy && speechQueue.length === 0) {
+      countdownThenRound();
+    } else if(state.running) {
+      const wait = setInterval(()=>{
+        if(!state.running){ clearInterval(wait); return; }
+        if(!speechBusy && speechQueue.length === 0){
+          clearInterval(wait);
+          countdownThenRound();
+        }
+      }, 100);
+    }
+  }, 400);
 }
 
 function finishRound(){
@@ -530,7 +568,7 @@ function stopAll(){
   clearTimeout(state.cueTimeout);
   clearInterval(state.timerInterval);
   clearInterval(state.restInterval);
-  if("speechSynthesis" in window) speechSynthesis.cancel();
+  clearSpeech();
 }
 
 function finishTraining(){
