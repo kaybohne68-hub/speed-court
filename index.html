@@ -151,7 +151,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.1</div>
     </header>
 
     <section id="setup" class="card">
@@ -181,6 +181,21 @@
             <option value="3" selected>3</option>
             <option value="5">5</option>
           </select>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label for="countdown">Start-Countdown</label>
+          <select id="countdown">
+            <option value="3">3 Sekunden</option>
+            <option value="5" selected>5 Sekunden</option>
+            <option value="10">10 Sekunden</option>
+          </select>
+        </div>
+        <div>
+          <label>Startsignal</label>
+          <div class="pill" style="margin-top:0">🔊 Countdown + „Los!“</div>
         </div>
       </div>
 
@@ -294,14 +309,21 @@ let state = {
 $("minDelay").oninput = e => $("minVal").textContent = e.target.value;
 $("maxDelay").oninput = e => $("maxVal").textContent = e.target.value;
 
-function speak(text){
-  if ($("signal").value !== "voice") return;
+function speak(text, force=false){
+  if (!force && $("signal").value !== "voice") return;
   if (!("speechSynthesis" in window)) return;
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "de-DE";
-  u.rate = 1.1;
-  speechSynthesis.speak(u);
+  try{
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-DE";
+    u.rate = 1.0;
+    const voices = synth.getVoices();
+    const de = voices.find(v => /^de(-|_)/i.test(v.lang)) ||
+               voices.find(v => /deutsch|german/i.test(v.name));
+    if (de) u.voice = de;
+    synth.speak(u);
+  }catch(e){}
 }
 
 function beep(){
@@ -399,18 +421,41 @@ function startTraining(){
 }
 
 function countdownThenRound(){
-  let n=3;
+  let n = parseInt($("countdown").value, 10) || 5;
   $("phase").textContent = "Start in";
   $("direction").textContent = n;
   $("timer").textContent = $("duration").value;
+
+  if ("speechSynthesis" in window) {
+    try {
+      speechSynthesis.resume();
+      speechSynthesis.getVoices();
+    } catch(e) {}
+  }
+
+  speak(String(n), true);
+  beep();
+  vibrate(35);
+
   const c = setInterval(()=>{
+    if (!state.running) {
+      clearInterval(c);
+      return;
+    }
     n--;
-    if(n>0){
-      $("direction").textContent=n;
-      beep(); vibrate(35);
+    if(n > 0){
+      $("direction").textContent = n;
+      speak(String(n), true);
+      beep();
+      vibrate(35);
     }else{
       clearInterval(c);
-      startRound();
+      $("direction").textContent = "LOS!";
+      $("phase").textContent = "Los!";
+      speak("Los!", true);
+      beep();
+      vibrate([80,50,120]);
+      setTimeout(startRound, 650);
     }
   },1000);
 }

@@ -1,4 +1,4 @@
-# Speed Court V1
+# Speed Court V1.1
 
 Badminton Sprint- und Footwork-Trainer als kleine Progressive Web App.
 
@@ -31,3 +31,9 @@ Für Nutzung auf dem Smartphone kannst du den Ordner z. B. auf GitHub Pages, Net
 oder einen anderen statischen Webhost laden.
 
 Hinweis: Sprachansage nutzt die im Browser vorhandene deutsche Text-to-Speech-Stimme.
+
+
+## Neu in V1.1
+- Start-Countdown wählbar: 3, 5 oder 10 Sekunden
+- Große Countdown-Anzeige
+- Sprachansage der Zahlen und „Los!“
