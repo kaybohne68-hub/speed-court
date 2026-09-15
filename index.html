@@ -151,11 +151,26 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.6.1</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.7</div>
     </header>
 
     <section id="setup" class="card">
       <h2>Training einstellen</h2>
+      <div style="background:#0f172a;border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0 18px">
+        <label for="playerSelect" style="margin-top:0">👤 Spieler/in</label>
+        <div class="row">
+          <select id="playerSelect" style="flex:1;min-width:180px">
+            <option value="">Spieler/in auswählen …</option>
+          </select>
+          <button id="newPlayerBtn" class="secondary" style="width:auto;padding:12px 14px">+ Neu</button>
+        </div>
+        <div id="playerInfo" class="tiny" style="margin-top:10px">Noch kein Profil ausgewählt.</div>
+        <div id="playerActions" class="row hidden" style="margin-top:10px">
+          <button id="historyBtn" class="secondary" style="width:auto;padding:10px 12px">📊 Verlauf</button>
+          <button id="deletePlayerBtn" class="secondary" style="width:auto;padding:10px 12px">Spieler löschen</button>
+        </div>
+      </div>
+
 
       <label for="mode">Modus</label>
       <select id="mode">
@@ -277,8 +292,16 @@
       </div>
     </section>
 
-    <section id="results" class="card hidden">
-      <h2>Training beendet ✓</h2>
+    
+    <section id="history" class="card hidden">
+      <h2 id="historyTitle">Trainingsverlauf</h2>
+      <div id="historySummary" class="stats"></div>
+      <div id="historyList" style="margin-top:14px"></div>
+      <button id="historyBackBtn" class="primary" style="margin-top:14px">Zurück</button>
+    </section>
+
+<section id="results" class="card hidden">
+      <h2 id="resultTitle">Training beendet ✓</h2>
       <div class="stats">
         <div class="stat"><b id="resCues">0</b><span>Signale</span></div>
         <div class="stat"><b id="resTime">0s</b><span>Trainingszeit</span></div>
@@ -476,6 +499,7 @@ function doDirection(){
 }
 
 function startTraining(){
+  saveCurrentSettings();
   unlockMediaAudio();
   if (parseFloat($("maxDelay").value) < parseFloat($("minDelay").value)){
     $("maxDelay").value = $("minDelay").value;
@@ -619,6 +643,7 @@ function stopAll(){
 function finishTraining(){
   if(!state.running) return;
   state.running=false;
+  savePlayerResult();
   stopAll();
   clearActive();
 
@@ -637,6 +662,7 @@ function finishTraining(){
 
   // Give the spoken finish message time to complete before switching screens.
   const showResults = () => {
+    $("resultTitle").textContent = currentPlayer() ? `Training beendet ✓ · ${currentPlayer()}` : "Training beendet ✓";
     $("training").classList.add("hidden");
     $("results").classList.remove("hidden");
 
@@ -690,6 +716,144 @@ $("audioTestBtn").onclick=()=>{
   }catch(e){}
   setTimeout(()=>speak("Speed Court. Audio Test.", true), 250);
 };
+
+
+const PROFILE_KEY = "speedCourtProfilesV17";
+const ACTIVE_PLAYER_KEY = "speedCourtActivePlayerV17";
+
+function getProfiles(){
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}"); }
+  catch(e){ return {}; }
+}
+function saveProfiles(p){ localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }
+function currentPlayer(){ return $("playerSelect").value; }
+
+function collectSettings(){
+  return {
+    mode:$("mode").value,
+    duration:$("duration").value,
+    rounds:$("rounds").value,
+    countdown:$("countdown").value,
+    minDelay:$("minDelay").value,
+    maxDelay:$("maxDelay").value,
+    rest:$("rest").value,
+    signal:$("signal").value,
+    vibrate:$("vibrate").checked
+  };
+}
+function applySettings(s){
+  if(!s) return;
+  ["mode","duration","rounds","countdown","minDelay","maxDelay","rest","signal"].forEach(id=>{
+    if(s[id] !== undefined && $(id)) $(id).value = s[id];
+  });
+  if(s.vibrate !== undefined) $("vibrate").checked = !!s.vibrate;
+  $("minVal").textContent = $("minDelay").value;
+  $("maxVal").textContent = $("maxDelay").value;
+}
+function saveCurrentSettings(){
+  const name=currentPlayer();
+  if(!name) return;
+  const profiles=getProfiles();
+  if(!profiles[name]) profiles[name]={settings:{},history:[]};
+  profiles[name].settings=collectSettings();
+  saveProfiles(profiles);
+}
+function refreshPlayers(selectName){
+  const profiles=getProfiles();
+  const sel=$("playerSelect");
+  sel.innerHTML='<option value="">Spieler/in auswählen …</option>';
+  Object.keys(profiles).sort((a,b)=>a.localeCompare(b,"de")).forEach(name=>{
+    const o=document.createElement("option"); o.value=name; o.textContent=name; sel.appendChild(o);
+  });
+  const wanted=selectName || localStorage.getItem(ACTIVE_PLAYER_KEY) || "";
+  if(wanted && profiles[wanted]) sel.value=wanted;
+  updatePlayerUI();
+}
+function updatePlayerUI(){
+  const name=currentPlayer(), profiles=getProfiles();
+  if(!name || !profiles[name]){
+    $("playerInfo").textContent="Noch kein Profil ausgewählt.";
+    $("playerActions").classList.add("hidden");
+    return;
+  }
+  localStorage.setItem(ACTIVE_PLAYER_KEY,name);
+  applySettings(profiles[name].settings);
+  const hist=profiles[name].history || [];
+  const last=hist[hist.length-1];
+  $("playerInfo").innerHTML = last
+    ? `Letztes Training: <b>${new Date(last.date).toLocaleDateString("de-DE")}</b> · ${last.cues} Signale · ${last.rounds} Runden`
+    : "Profil bereit · noch kein Training gespeichert.";
+  $("playerActions").classList.remove("hidden");
+}
+function addPlayer(){
+  const raw=prompt("Name des Spielers / der Spielerin:");
+  if(!raw) return;
+  const name=raw.trim();
+  if(!name) return;
+  const profiles=getProfiles();
+  if(!profiles[name]) profiles[name]={settings:collectSettings(),history:[]};
+  saveProfiles(profiles);
+  refreshPlayers(name);
+}
+function deletePlayer(){
+  const name=currentPlayer(); if(!name) return;
+  if(!confirm(`Spielerprofil „${name}“ wirklich löschen?`)) return;
+  const profiles=getProfiles(); delete profiles[name]; saveProfiles(profiles);
+  localStorage.removeItem(ACTIVE_PLAYER_KEY);
+  refreshPlayers("");
+}
+function savePlayerResult(){
+  const name=currentPlayer(); if(!name) return;
+  const profiles=getProfiles();
+  if(!profiles[name]) profiles[name]={settings:{},history:[]};
+  profiles[name].settings=collectSettings();
+  profiles[name].history = profiles[name].history || [];
+  const activeSeconds=parseInt($("duration").value,10)*Math.min(state.round,parseInt($("rounds").value,10));
+  profiles[name].history.push({
+    date:new Date().toISOString(),
+    mode:$("mode").value,
+    cues:state.cues,
+    rounds:Math.min(state.round,parseInt($("rounds").value,10)),
+    duration:activeSeconds,
+    counts:{...state.counts}
+  });
+  profiles[name].history=profiles[name].history.slice(-50);
+  saveProfiles(profiles);
+}
+function showHistory(){
+  const name=currentPlayer(), profiles=getProfiles();
+  if(!name || !profiles[name]) return;
+  const hist=profiles[name].history || [];
+  $("setup").classList.add("hidden");
+  $("results").classList.add("hidden");
+  $("history").classList.remove("hidden");
+  $("historyTitle").textContent=`📊 Verlauf · ${name}`;
+  const totalTime=hist.reduce((a,x)=>a+(x.duration||0),0);
+  const totalCues=hist.reduce((a,x)=>a+(x.cues||0),0);
+  $("historySummary").innerHTML=`
+    <div class="stat"><b>${hist.length}</b><span>Trainings</span></div>
+    <div class="stat"><b>${Math.round(totalTime/60)}</b><span>Minuten</span></div>
+    <div class="stat"><b>${totalCues}</b><span>Signale</span></div>`;
+  $("historyList").innerHTML = hist.length ? hist.slice().reverse().map(x=>{
+    const c=x.counts||{};
+    return `<div style="background:#0f172a;border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0">
+      <b>${new Date(x.date).toLocaleString("de-DE")}</b><br>
+      <span class="tiny">${x.rounds} Runden · ${x.duration}s · ${x.cues} Signale<br>
+      VL ${c.vl||0} · VR ${c.vr||0} · L ${c.ml||0} · R ${c.mr||0} · HL ${c.hl||0} · HR ${c.hr||0}</span>
+    </div>`;
+  }).join("") : '<p class="tiny">Noch keine Trainings gespeichert.</p>';
+}
+$("newPlayerBtn").onclick=addPlayer;
+$("deletePlayerBtn").onclick=deletePlayer;
+$("historyBtn").onclick=showHistory;
+$("historyBackBtn").onclick=()=>{
+  $("history").classList.add("hidden"); $("setup").classList.remove("hidden");
+};
+$("playerSelect").onchange=updatePlayerUI;
+["mode","duration","rounds","countdown","minDelay","maxDelay","rest","signal","vibrate"].forEach(id=>{
+  $(id).addEventListener("change",saveCurrentSettings);
+});
+refreshPlayers();
 
 $("startBtn").onclick=startTraining;
 $("stopBtn").onclick=finishTraining;

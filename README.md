@@ -1,4 +1,4 @@
-# Speed Court V1.6.1
+# Speed Court V1.7
 
 Badminton Sprint- und Footwork-Trainer als kleine Progressive Web App.
 
@@ -79,3 +79,13 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Kein audio-Ordner mehr erforderlich
 - Alle WAV-Signaltöne sind direkt in index.html eingebettet
 - Für GitHub müssen nur README.md, index.html, manifest.json und sw.js hochgeladen werden
+
+
+## Neu in V1.7 – Spielerprofile
+- Spieler/in anlegen und auswählen
+- Letzte Trainingseinstellungen werden pro Profil automatisch gespeichert und geladen
+- Ergebnisse werden pro Spieler/in gespeichert
+- Persönlicher Trainingsverlauf mit bis zu 50 Einheiten
+- Übersicht über Trainingsanzahl, Gesamtminuten und Signale
+- Profile können wieder gelöscht werden
+- Daten bleiben lokal im Browser/auf dem Gerät; kein Konto und kein Server nötig
