@@ -151,7 +151,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.4</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.5</div>
     </header>
 
     <section id="setup" class="card">
@@ -572,30 +572,62 @@ function finishTraining(){
   state.running=false;
   stopAll();
   clearActive();
-  $("training").classList.add("hidden");
-  $("results").classList.remove("hidden");
 
-  const activeSeconds = parseInt($("duration").value,10) *
-    Math.min(state.round, parseInt($("rounds").value,10));
+  // Do not jump directly to the result screen.
+  // Keep the training screen visible and clearly signal the end.
+  $("phase").textContent = "Training beendet";
+  $("direction").textContent = "GESCHAFFT ✓";
+  $("timer").textContent = "0";
+  $("roundText").textContent = "Training abgeschlossen";
 
-  $("resCues").textContent=state.cues;
-  $("resTime").textContent=activeSeconds+"s";
-  $("resRounds").textContent=Math.min(state.round, parseInt($("rounds").value,10));
+  clearSpeech();
+  speak("Training beendet.", true);
+  beep();
+  vibrate([120,80,120]);
 
-  const names={vl:"Vorne links",vr:"Vorne rechts",ml:"Links",mr:"Rechts",hl:"Hinten links",hr:"Hinten rechts"};
-  $("resBreakdown").innerHTML = Object.entries(state.counts)
-    .map(([k,v])=>`${names[k]}: <b>${v}</b>`)
-    .join(" · ");
+  // Give the spoken finish message time to complete before switching screens.
+  const showResults = () => {
+    $("training").classList.add("hidden");
+    $("results").classList.remove("hidden");
 
-  const history = JSON.parse(localStorage.getItem("speedCourtHistory") || "[]");
-  history.push({
-    date:new Date().toISOString(),
-    mode:$("mode").value,
-    cues:state.cues,
-    rounds:Math.min(state.round, parseInt($("rounds").value,10)),
-    duration:activeSeconds
-  });
-  localStorage.setItem("speedCourtHistory", JSON.stringify(history.slice(-30)));
+    const activeSeconds = parseInt($("duration").value,10) *
+      Math.min(state.round, parseInt($("rounds").value,10));
+
+    $("resCues").textContent=state.cues;
+    $("resTime").textContent=activeSeconds+"s";
+    $("resRounds").textContent=Math.min(state.round, parseInt($("rounds").value,10));
+
+    const names={vl:"Vorne links",vr:"Vorne rechts",ml:"Links",mr:"Rechts",hl:"Hinten links",hr:"Hinten rechts"};
+    $("resBreakdown").innerHTML = Object.entries(state.counts)
+      .map(([k,v])=>`${names[k]}: <b>${v}</b>`)
+      .join(" · ");
+
+    const history = JSON.parse(localStorage.getItem("speedCourtHistory") || "[]");
+    history.push({
+      date:new Date().toISOString(),
+      mode:$("mode").value,
+      cues:state.cues,
+      rounds:Math.min(state.round, parseInt($("rounds").value,10)),
+      duration:activeSeconds
+    });
+    localStorage.setItem("speedCourtHistory", JSON.stringify(history.slice(-30)));
+  };
+
+  // Wait until TTS is done, but at least 2.2 seconds so the transition never feels abrupt.
+  const minEnd = Date.now() + 2200;
+  const waitForSpeech = setInterval(()=>{
+    if(Date.now() >= minEnd && !speechBusy && speechQueue.length === 0){
+      clearInterval(waitForSpeech);
+      showResults();
+    }
+  },100);
+
+  // Safety fallback for browsers that fail to fire speech end events.
+  setTimeout(()=>{
+    if(!$("results").classList.contains("hidden")) return;
+    clearInterval(waitForSpeech);
+    showResults();
+  },5000);
 }
 
 $("startBtn").onclick=startTraining;
