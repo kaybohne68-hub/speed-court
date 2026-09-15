@@ -1,4 +1,4 @@
-# Speed Court V1.8.2
+# Speed Court V1.8.3
 
 Badminton Sprint- und Footwork-Trainer als kleine Progressive Web App.
 
@@ -114,3 +114,10 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Heller Ton = Zielposition sollte erreicht sein.
 - Tiefer Ton = Zentralposition sollte wieder erreicht sein.
 - Keine zusätzlichen Zeitregler nötig.
+
+## Neu in V1.8.3 – angenehmere Signaltöne
+- Position erreicht: kurzer heller, aufsteigender musikalischer Doppelton.
+- Zentrum erreicht: weicherer, tieferer, absteigender Doppelton.
+- Die Töne bleiben kurz und deutlich unterscheidbar.
+- Audio ist weiterhin direkt in index.html eingebettet; kein Audio-Ordner erforderlich.
+- Trainingslogik, Spielerprofile und Zeitberechnung aus V1.8.2 bleiben unverändert.
