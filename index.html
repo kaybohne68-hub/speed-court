@@ -151,7 +151,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.3</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.4</div>
     </header>
 
     <section id="setup" class="card">
@@ -458,34 +458,30 @@ function countdownThenRound(){
 
   clearSpeech();
 
-  // Spoken as one utterance, so mobile TTS cannot overlap individual numbers.
-  const words = [];
-  for(let i=n; i>=1; i--) words.push(String(i));
-  words.push("Los!");
-  speak(words.join(". ") , true);
+  // Exactly one countdown step per 1000 ms.
+  function countdownStep(){
+    if(!state.running) return;
 
-  beep();
-  vibrate(35);
-
-  const c = setInterval(()=>{
-    if (!state.running) {
-      clearInterval(c);
-      return;
-    }
-    n--;
     if(n > 0){
       $("direction").textContent = n;
+      clearSpeech();
+      speak(String(n), true);
       beep();
       vibrate(35);
+      n--;
+      setTimeout(countdownStep, 1000);
     }else{
-      clearInterval(c);
+      clearSpeech();
       $("direction").textContent = "LOS!";
       $("phase").textContent = "Los!";
+      speak("Los!", true);
       beep();
       vibrate([80,50,120]);
-      setTimeout(startRound, 650);
+      setTimeout(startRound, 1000);
     }
-  },1000);
+  }
+
+  countdownStep();
 }
 
 function startRound(){
