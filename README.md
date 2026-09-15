@@ -198,11 +198,12 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Zentrum: 1,5 Sekunden.
 - Sonstige Trainingslogik unverändert.
 
-## V1.9.0
-- Trainingsansicht zeigt nur noch die eigene Badminton-Feldhälfte: Netz bis hintere Linie.
-- Feld bleibt beim gestarteten Training im Mittelpunkt; keine Seitenleiste.
-- Zentraler Bereich wurde optisch etwas weiter nach vorn gesetzt.
-- Pause startet erst nach dem rechnerischen Rückweg ins Zentrum.
-- Hin- und Rückwegzeiten werden pro Position individuell berechnet:
-  Mitte kürzer, vorne mittel, hinten länger.
-- Positionston 0,5 s und Zentrumston 1,5 s sowie der tiefere Klang aus V1.8.18 bleiben erhalten.
+## V1.9.1
+- Neu aufgebaut auf V1.8.18, damit die dortigen Töne exakt erhalten bleiben.
+- Positionston: 0,5 s; Zentrumston: 1,5 s.
+- Trainingsfeld als Draufsicht auf nur eine Badminton-Feldhälfte.
+- Netz oben, hintere Linie unten, sechs Zielpositionen.
+- Zentraler Bereich optisch weiter vorn.
+- Beim laufenden Training bleibt das Feld die Hauptanzeige.
+- Rücklaufzeit wird je nach Zielposition individuell berechnet.
+- Die Zufallspause startet erst nach vollständiger Rückkehr ins Zentrum.

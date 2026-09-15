@@ -89,8 +89,8 @@
     .court:before{
       content:"NETZ";
       position:absolute;left:0;right:0;top:0;
-      height:24px;background:#e2e8f0;color:#0f172a;
-      font-size:11px;font-weight:900;text-align:center;line-height:24px;
+      height:22px;background:#e2e8f0;color:#0f172a;
+      font-size:10px;font-weight:900;text-align:center;line-height:22px;
       z-index:2
     }
     .center-line{
@@ -116,11 +116,11 @@
       transform:translate(-50%,-50%) scale(1.18);
       box-shadow:0 0 32px rgba(255,255,255,.75)
     }
-    .vl{left:25%;top:20%}.vr{left:75%;top:20%}
-    .ml{left:18%;top:48%}.mr{left:82%;top:48%}
+    .vl{left:25%;top:19%}.vr{left:75%;top:19%}
+    .ml{left:18%;top:47%}.mr{left:82%;top:47%}
     .hl{left:25%;top:82%}.hr{left:75%;top:82%}
     .player{
-      position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);
+      position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
       width:34px;height:34px;border-radius:50%;background:#fbbf24;
       border:3px solid white;box-shadow:0 0 18px rgba(251,191,36,.7)
     }
@@ -152,7 +152,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.9.0</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.9.1</div>
     </header>
 
     <section id="setup" class="card">
@@ -537,16 +537,14 @@ function doDirection(){
   const hi = Math.max(minMs, maxMs);
   const baseMs = lo + Math.random() * (hi - lo);
 
-  // Individuelle Bewegungszeit pro Wiederholung:
-  // Hinweg explosiv, Rückweg abhängig von der Entfernung der Position.
+  // Individuelle Laufzeiten je nach Entfernung der Zielposition.
+  // Die Rückkehr ins Zentrum wird vollständig abgewartet, bevor die Pause beginnt.
   const targetFactor = (d.id === "ml" || d.id === "mr") ? 0.60 :
                        (d.id === "vl" || d.id === "vr") ? 0.72 : 0.82;
   const returnFactor = (d.id === "ml" || d.id === "mr") ? 0.72 :
                        (d.id === "vl" || d.id === "vr") ? 0.88 : 1.00;
-
   const toTargetMs = baseMs * targetFactor;
   const toCenterMs = baseMs * returnFactor;
-
   const targetMs = $("mode").value === "sprint" ? Math.max(toTargetMs, 600) : toTargetMs;
   const centerMs = $("mode").value === "sprint" ? Math.max(toCenterMs, 750) : toCenterMs;
 
@@ -565,8 +563,7 @@ function doDirection(){
       clearActive();
       vibrate([30,30,30]);
 
-      // WICHTIG: Die Pause beginnt erst jetzt, nachdem der Spieler
-      // rechnerisch wieder im zentralen Bereich angekommen ist.
+      // Erst NACH der vollständigen Rückkehr ins Zentrum beginnt die Pause.
       const reactionPause = lo + Math.random() * (hi - lo);
       state.nextTimeout = setTimeout(()=>{
         if (!state.running || Date.now() >= state.endTs) return;
