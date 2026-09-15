@@ -215,3 +215,10 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Erst danach beginnt die eingestellte Zufallspause.
 - Erst nach dieser Pause folgt die nächste Richtungsansage.
 - Feldansicht und individuelle Rücklaufzeiten aus V1.9.1 bleiben unverändert.
+
+## V1.10.0
+- Richtungen, Countdown, Los, Rundenpause, Bereit-machen und Trainingsende sind jetzt echte eingebettete WAV-Mediendateien.
+- speechSynthesis wird für diese Trainingsansagen nicht mehr verwendet.
+- Sprache und Signaltöne laufen dadurch über den normalen Medien-Audiokanal, was die Bluetooth-Box-Kompatibilität verbessert.
+- Die Sprachdateien werden in einer Warteschlange nacheinander abgespielt, damit Ansagen sich nicht gegenseitig überlagern.
+- Töne, Feldansicht und Trainingsablauf aus V1.9.2 bleiben erhalten.
