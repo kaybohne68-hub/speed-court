@@ -151,7 +151,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.1</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.2</div>
     </header>
 
     <section id="setup" class="card">
@@ -482,6 +482,21 @@ function startRound(){
   state.cueTimeout=setTimeout(cue,700);
 }
 
+function announcePause(seconds){
+  $("phase").textContent = "Pause";
+  $("direction").textContent = `PAUSE – ${seconds} SEK.`;
+  speak(`Pause. ${seconds} Sekunden.`, true);
+}
+
+function announceReadyAndCountdown(){
+  $("phase").textContent = "Nächste Runde";
+  $("direction").textContent = "BEREIT MACHEN";
+  speak("Bereit machen. Nächste Runde.", true);
+  setTimeout(()=>{
+    if(state.running) countdownThenRound();
+  }, 1800);
+}
+
 function finishRound(){
   clearTimeout(state.cueTimeout);
   clearInterval(state.timerInterval);
@@ -496,8 +511,7 @@ function finishRound(){
 
   state.round++;
   let remain=parseInt($("rest").value,10);
-  $("phase").textContent="Rundenpause";
-  $("direction").textContent="ERHOLEN";
+  announcePause(remain);
   $("timer").textContent=remain;
   $("roundText").textContent=`Nächste Runde: ${state.round} / ${totalRounds}`;
 
@@ -507,7 +521,7 @@ function finishRound(){
     $("timer").textContent=remain;
     if(remain<=0){
       clearInterval(state.restInterval);
-      countdownThenRound();
+      announceReadyAndCountdown();
     }
   },1000);
 }

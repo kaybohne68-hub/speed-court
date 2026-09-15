@@ -1,4 +1,4 @@
-# Speed Court V1.1
+# Speed Court V1.2
 
 Badminton Sprint- und Footwork-Trainer als kleine Progressive Web App.
 
@@ -37,3 +37,9 @@ Hinweis: Sprachansage nutzt die im Browser vorhandene deutsche Text-to-Speech-St
 - Start-Countdown wählbar: 3, 5 oder 10 Sekunden
 - Große Countdown-Anzeige
 - Sprachansage der Zahlen und „Los!“
+
+
+## Neu in V1.2
+- Am Rundenende: Ansage „Pause“ plus eingestellte Pausenlänge
+- Vor jeder Folgerunde: „Bereit machen. Nächste Runde.“
+- Danach erneut der vollständige Start-Countdown mit „Los!“
