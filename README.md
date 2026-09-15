@@ -1,4 +1,4 @@
-# Speed Court V1.6
+# Speed Court V1.6.1
 
 Badminton Sprint- und Footwork-Trainer als kleine Progressive Web App.
 
@@ -73,3 +73,9 @@ Hinweis: Sprachansage nutzt die im Browser vorhandene deutsche Text-to-Speech-St
 - Audiodateien werden für Offline-Betrieb mit gecacht
 
 Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. Die neuen WAV-Signale laufen dagegen über den normalen Medienkanal und dienen auch als zuverlässiger Bluetooth-Routing-Test.
+
+
+## V1.6.1 – vereinfachter GitHub-Upload
+- Kein audio-Ordner mehr erforderlich
+- Alle WAV-Signaltöne sind direkt in index.html eingebettet
+- Für GitHub müssen nur README.md, index.html, manifest.json und sw.js hochgeladen werden
