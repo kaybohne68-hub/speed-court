@@ -79,7 +79,7 @@
     .court{
       position:relative;
       width:min(92vw,420px);
-      aspect-ratio:610/1340;
+      aspect-ratio:610/670;
       border:4px solid #e2e8f0;
       background:#125f45;
       border-radius:8px;
@@ -87,19 +87,20 @@
       box-shadow:inset 0 0 0 2px rgba(255,255,255,.15);
     }
     .court:before{
-      content:"";
-      position:absolute;left:0;right:0;top:50%;
-      height:4px;background:#e2e8f0;
-      transform:translateY(-2px)
+      content:"NETZ";
+      position:absolute;left:0;right:0;top:0;
+      height:24px;background:#e2e8f0;color:#0f172a;
+      font-size:11px;font-weight:900;text-align:center;line-height:24px;
+      z-index:2
     }
     .center-line{
-      position:absolute;left:50%;top:0;bottom:0;width:3px;background:#e2e8f0;
+      position:absolute;left:50%;top:24%;bottom:0;width:3px;background:#e2e8f0;
       transform:translateX(-1.5px)
     }
     .service1,.service2{
       position:absolute;left:0;right:0;height:3px;background:#e2e8f0
     }
-    .service1{top:24%}.service2{bottom:24%}
+    .service1{top:24%}.service2{bottom:12%}
     .target{
       position:absolute;
       width:64px;height:64px;border-radius:50%;
@@ -115,11 +116,11 @@
       transform:translate(-50%,-50%) scale(1.18);
       box-shadow:0 0 32px rgba(255,255,255,.75)
     }
-    .vl{left:25%;top:16%}.vr{left:75%;top:16%}
-    .ml{left:18%;top:50%}.mr{left:82%;top:50%}
-    .hl{left:25%;top:84%}.hr{left:75%;top:84%}
+    .vl{left:25%;top:20%}.vr{left:75%;top:20%}
+    .ml{left:18%;top:48%}.mr{left:82%;top:48%}
+    .hl{left:25%;top:82%}.hr{left:75%;top:82%}
     .player{
-      position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);
+      position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);
       width:34px;height:34px;border-radius:50%;background:#fbbf24;
       border:3px solid white;box-shadow:0 0 18px rgba(251,191,36,.7)
     }
@@ -151,7 +152,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.8.18</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.9.0</div>
     </header>
 
     <section id="setup" class="card">
@@ -536,15 +537,18 @@ function doDirection(){
   const hi = Math.max(minMs, maxMs);
   const baseMs = lo + Math.random() * (hi - lo);
 
-  // Explosiver Weg zur Position: 75 % des Grundwerts.
-  // Kontrollierter Rückweg ins Zentrum: 100 % des Grundwerts.
-  const toTargetMs = baseMs * 0.75;
-  const toCenterMs = baseMs;
+  // Individuelle Bewegungszeit pro Wiederholung:
+  // Hinweg explosiv, Rückweg abhängig von der Entfernung der Position.
+  const targetFactor = (d.id === "ml" || d.id === "mr") ? 0.60 :
+                       (d.id === "vl" || d.id === "vr") ? 0.72 : 0.82;
+  const returnFactor = (d.id === "ml" || d.id === "mr") ? 0.72 :
+                       (d.id === "vl" || d.id === "vr") ? 0.88 : 1.00;
 
-  // Sprint-Modus bekommt weiterhin eine kleine Untergrenze,
-  // damit die Signale nicht unbrauchbar dicht aufeinander liegen.
-  const targetMs = $("mode").value === "sprint" ? Math.max(toTargetMs, 750) : toTargetMs;
-  const centerMs = $("mode").value === "sprint" ? Math.max(toCenterMs, 1000) : toCenterMs;
+  const toTargetMs = baseMs * targetFactor;
+  const toCenterMs = baseMs * returnFactor;
+
+  const targetMs = $("mode").value === "sprint" ? Math.max(toTargetMs, 600) : toTargetMs;
+  const centerMs = $("mode").value === "sprint" ? Math.max(toCenterMs, 750) : toCenterMs;
 
   state.cueTimeout = setTimeout(()=>{
     if (!state.running || Date.now() >= state.endTs) return;
@@ -561,8 +565,8 @@ function doDirection(){
       clearActive();
       vibrate([30,30,30]);
 
-      // Erst nach dem Zentrum folgt eine neue, unabhängige
-      // Zufallspause zwischen Minimum und Maximum.
+      // WICHTIG: Die Pause beginnt erst jetzt, nachdem der Spieler
+      // rechnerisch wieder im zentralen Bereich angekommen ist.
       const reactionPause = lo + Math.random() * (hi - lo);
       state.nextTimeout = setTimeout(()=>{
         if (!state.running || Date.now() >= state.endTs) return;
