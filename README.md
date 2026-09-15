@@ -1,4 +1,4 @@
-# Speed Court V1.7
+# Speed Court V1.8
 
 Badminton Sprint- und Footwork-Trainer als kleine Progressive Web App.
 
@@ -89,3 +89,18 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Übersicht über Trainingsanzahl, Gesamtminuten und Signale
 - Profile können wieder gelöscht werden
 - Daten bleiben lokal im Browser/auf dem Gerät; kein Konto und kein Server nötig
+
+
+## Neu in V1.7.1
+- Minimale Signalpause kann bis 5,0 Sekunden eingestellt werden
+- Maximale Signalpause kann bis 5,0 Sekunden eingestellt werden
+
+
+## Neu in V1.8 – Lauf- und Rückkehrsignale
+- Einstellbare Zeit bis zur angesagten Feldposition: 0,5–5,0 s
+- Einstellbare Zeit zurück zum Zentrum: 0,5–5,0 s
+- Heller Doppelton = Zielposition sollte erreicht sein
+- Tiefer Doppelton = Spieler/in sollte wieder im Zentrum stehen
+- Erst danach beginnt die zufällige Pause bis zur nächsten Richtungsansage
+- Beide Zeiten werden pro Spielerprofil gespeichert
+- Töne sind direkt in index.html eingebettet; kein Audio-Ordner nötig
