@@ -222,3 +222,9 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Sprache und Signaltöne laufen dadurch über den normalen Medien-Audiokanal, was die Bluetooth-Box-Kompatibilität verbessert.
 - Die Sprachdateien werden in einer Warteschlange nacheinander abgespielt, damit Ansagen sich nicht gegenseitig überlagern.
 - Töne, Feldansicht und Trainingsablauf aus V1.9.2 bleiben erhalten.
+
+## V1.10.1
+- Position: gesprochenes BUM.
+- Zentraler Bereich: gesprochenes ZB (Zett Bee).
+- Ablauf: Richtung → Position → BUM → Rückweg → ZB → Pause → nächste Richtung.
+- Beide Signale sind echte Media-Audiodateien für Bluetooth-Ausgabe.
