@@ -292,3 +292,12 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Zusätzlicher Sicherheitsstart nach Ablauf der gewählten Countdownzeit.
 - Bestehende Frauenstimmen- und Richtungsdateien bleiben erhalten.
 - PWA-Cache auf speed-court-v1-11-1 aktualisiert.
+
+## V1.11.2
+- Countdown verwendet nicht mehr das nicht vorhandene #status-Element.
+- Neues sichtbares Vollbild-Countdown-Overlay im Trainingsbildschirm.
+- 3 / 5 / 10 Sekunden werden sichtbar heruntergezählt.
+- Danach erscheint LOS! und startRound() wird aufgerufen.
+- Audio bleibt vom Zeitgeber getrennt und kann den Start nicht blockieren.
+- Zusätzlicher Sicherheitsstart bleibt aktiv.
+- PWA-Cache auf speed-court-v1-11-2 aktualisiert.

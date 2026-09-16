@@ -152,7 +152,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.11.1</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.11.2</div>
     </header>
 
     <section id="setup" class="card">
@@ -640,70 +640,75 @@ function countdownThenRound(){
     countdownTimer = null;
   }
 
-  const selected = parseInt($("countdown").value, 10) || 3;
+  const overlay = $("countdownOverlay");
+  const numberEl = $("countdownNumber");
+  const selected = parseInt($("countdown").value,10) || 3;
   let remaining = selected;
-  let hasStarted = false;
+  let launched = false;
+
+  const hideOverlay = ()=>{
+    if(overlay) overlay.style.display = "none";
+  };
 
   const launchRound = ()=>{
-    if(hasStarted) return;
-    hasStarted = true;
+    if(launched) return;
+    launched = true;
 
     if(countdownTimer){
       clearInterval(countdownTimer);
       countdownTimer = null;
     }
 
-    $("status").textContent = "Los!";
+    if(numberEl) numberEl.textContent = "LOS!";
 
-    // "Los" darf abgespielt werden, steuert aber NICHT den Trainingsstart.
     try { speak("Los!", true); } catch(e) {}
 
     setTimeout(()=>{
+      hideOverlay();
       try{
         startRound();
       }catch(e){
-        console.error("startRound fehlgeschlagen", e);
+        console.error("startRound fehlgeschlagen",e);
+        hideOverlay();
       }
-    }, 300);
+    },450);
   };
 
-  const showSecond = ()=>{
-    if(hasStarted) return;
+  if(overlay) overlay.style.display = "flex";
+
+  const tick = ()=>{
+    if(launched) return;
 
     if(remaining <= 0){
       launchRound();
       return;
     }
 
-    $("status").textContent = remaining;
+    if(numberEl) numberEl.textContent = remaining;
 
-    // Zahl nur abspielen, wenn dafür eine eingebettete Audiodatei vorhanden ist.
-    // Ein Audiofehler beeinflusst den Timer nicht.
+    // Sprachansage ist optional und darf den Timer nie beeinflussen.
     try{
-      const key = String(remaining);
+      const key=String(remaining);
       if(VOICE_AUDIO && VOICE_AUDIO[key]){
-        speak(key, true);
+        speak(key,true);
       }
     }catch(e){}
 
     remaining--;
   };
 
-  // Erste Zahl sofort.
-  showSecond();
+  tick();
 
-  // Danach exakt jede Sekunde.
-  countdownTimer = setInterval(()=>{
+  countdownTimer=setInterval(()=>{
     if(remaining <= 0){
       launchRound();
     }else{
-      showSecond();
+      tick();
     }
-  }, 1000);
+  },1000);
 
-  // Sicherheitsstart: selbst wenn ein Browser den Interval-Timer stört,
-  // wird die Runde nach der gewählten Countdownzeit gestartet.
-  setTimeout(launchRound, selected * 1000 + 500);
+  // Unabhängiger Sicherheitsstart.
+  setTimeout(launchRound, selected*1000+500);
 }
 
 function startRound(){
@@ -1021,5 +1026,9 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }
 </script>
+<div id="countdownOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,16,32,.86);align-items:center;justify-content:center;flex-direction:column;color:white;font-weight:900;text-align:center;">
+  <div id="countdownNumber" style="font-size:min(34vw,220px);line-height:1;">3</div>
+  <div style="font-size:clamp(18px,4vw,34px);margin-top:18px;">TRAINING STARTET</div>
+</div>
 </body>
 </html>
