@@ -152,7 +152,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.11.0</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.11.1</div>
     </header>
 
     <section id="setup" class="card">
@@ -344,6 +344,8 @@ mediaAudio.playsInline = true;
 let mediaAudioContext = null;
 let mediaAudioSource = null;
 let mediaGain = null;
+
+let countdownTimer = null;
 
 function ensureMediaGain(){
   try{
@@ -633,61 +635,75 @@ function startTraining(){
 function countdownThenRound(){
   clearSpeech();
 
-  const selected = parseInt($("countdown").value, 10);
-  let remaining = selected;
-  let finished = false;
+  if(countdownTimer){
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
 
-  const finish = ()=>{
-    if(finished) return;
-    finished = true;
+  const selected = parseInt($("countdown").value, 10) || 3;
+  let remaining = selected;
+  let hasStarted = false;
+
+  const launchRound = ()=>{
+    if(hasStarted) return;
+    hasStarted = true;
+
     if(countdownTimer){
       clearInterval(countdownTimer);
       countdownTimer = null;
     }
+
     $("status").textContent = "Los!";
-    // Audio darf den Start niemals blockieren.
+
+    // "Los" darf abgespielt werden, steuert aber NICHT den Trainingsstart.
     try { speak("Los!", true); } catch(e) {}
+
     setTimeout(()=>{
-      try { startRound(); } catch(e) {
-        console.error("Startfehler:", e);
+      try{
+        startRound();
+      }catch(e){
+        console.error("startRound fehlgeschlagen", e);
       }
-    }, 350);
+    }, 300);
   };
 
-  const tick = ()=>{
-    if(finished) return;
+  const showSecond = ()=>{
+    if(hasStarted) return;
+
     if(remaining <= 0){
-      finish();
+      launchRound();
       return;
     }
 
     $("status").textContent = remaining;
 
-    // Vorhandene einzelne Frauenstimmen-Zahlen nutzen, falls vorhanden.
-    // Fehlendes Audio wird ignoriert; der Timer läuft trotzdem exakt weiter.
-    try {
-      if(VOICE_AUDIO[String(remaining)]){
-        speak(String(remaining), true);
+    // Zahl nur abspielen, wenn dafür eine eingebettete Audiodatei vorhanden ist.
+    // Ein Audiofehler beeinflusst den Timer nicht.
+    try{
+      const key = String(remaining);
+      if(VOICE_AUDIO && VOICE_AUDIO[key]){
+        speak(key, true);
       }
-    } catch(e) {}
+    }catch(e){}
 
     remaining--;
   };
 
-  // Erste Zahl sofort anzeigen/ansagen.
-  tick();
+  // Erste Zahl sofort.
+  showSecond();
 
-  // Danach exakt im Sekundentakt weiterzählen.
+  // Danach exakt jede Sekunde.
   countdownTimer = setInterval(()=>{
     if(remaining <= 0){
-      finish();
+      launchRound();
     }else{
-      tick();
+      showSecond();
     }
   }, 1000);
 
-  // Zusätzliche Notbremse: selbst bei einem Browser-/Audiofehler startet das Training.
-  setTimeout(finish, selected * 1000 + 600);
+  // Sicherheitsstart: selbst wenn ein Browser den Interval-Timer stört,
+  // wird die Runde nach der gewählten Countdownzeit gestartet.
+  setTimeout(launchRound, selected * 1000 + 500);
 }
 
 function startRound(){

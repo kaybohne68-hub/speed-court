@@ -283,3 +283,12 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Die problematische lange Countdown-MP3-Seek-Logik aus V1.10.8 wurde verworfen.
 - Vorne-links-Korrektur und die übrigen Frauenstimmen-Audios aus V1.10.7 bleiben erhalten.
 - PWA-Cache auf V1.11.0 aktualisiert.
+
+## V1.11.1
+- Kritischen Countdown-Fehler aus V1.11.0 behoben.
+- countdownTimer wird jetzt global initialisiert.
+- Countdown 3 / 5 / 10 Sekunden läuft unabhängig von Sprach-/Bluetooth-Audio.
+- „Los!“ startet die Runde über einen separaten Timer; Audio kann den Start nicht blockieren.
+- Zusätzlicher Sicherheitsstart nach Ablauf der gewählten Countdownzeit.
+- Bestehende Frauenstimmen- und Richtungsdateien bleiben erhalten.
+- PWA-Cache auf speed-court-v1-11-1 aktualisiert.
