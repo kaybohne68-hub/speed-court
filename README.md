@@ -228,3 +228,9 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Zentraler Bereich: gesprochenes ZB (Zett Bee).
 - Ablauf: Richtung → Position → BUM → Rückweg → ZB → Pause → nächste Richtung.
 - Beide Signale sind echte Media-Audiodateien für Bluetooth-Ausgabe.
+
+## V1.10.2
+- Alle Sprachansagen mit weiblicher/höherer deutscher Stimme neu erzeugt.
+- ZB deutlich schneller und kürzer gesprochen.
+- Schutzzeit nach ZB auf 0,45 s verkürzt.
+- Trainingslogik und Feldansicht bleiben unverändert.
