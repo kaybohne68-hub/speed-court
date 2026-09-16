@@ -111,6 +111,7 @@
       border:3px solid rgba(255,255,255,.75);
       transition:.15s;
     }
+    .target.mode-hidden{display:none!important}
     .target.active{
       background:#f8fafc;color:#0f172a;
       transform:translate(-50%,-50%) scale(1.18);
@@ -152,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.12.0</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.12.1</div>
     </header>
 
     <section id="setup" class="card">
@@ -176,6 +177,7 @@
       <select id="mode">
         <option value="footwork">6-Ecken Footwork</option>
         <option value="four">4-Ecken Footwork</option>
+        <option value="five">5-Punkte Footwork</option>
         <option value="seven">7-Positionen Footwork</option>
         <option value="sprint">Explosive Sprints</option>
         <option value="split">Split-Step Reaktion</option>
@@ -507,11 +509,33 @@ function clearActive(){
   document.querySelectorAll(".target").forEach(x=>x.classList.remove("active"));
 }
 
+
+function updateModeTargets(){
+  const mode = $("mode").value;
+  let allowed;
+  if(mode === "four"){
+    allowed = ["vl","vr","hl","hr"];
+  }else if(mode === "five"){
+    allowed = ["vl","vr","hl","hm","hr"];
+  }else if(mode === "seven"){
+    allowed = ["vl","vr","ml","mr","hl","hm","hr"];
+  }else{
+    // 6-Ecken, Explosive Sprints und Split-Step: ursprüngliche sechs Positionen.
+    allowed = ["vl","vr","ml","mr","hl","hr"];
+  }
+
+  document.querySelectorAll(".target[data-dir]").forEach(el=>{
+    el.classList.toggle("mode-hidden", !allowed.includes(el.dataset.dir));
+  });
+}
+
 function chooseDirection(){
   const mode = $("mode").value;
   let pool = dirs;
   if(mode === "four"){
     pool = dirs.filter(d => ["vl","vr","hl","hr"].includes(d.id));
+  } else if(mode === "five"){
+    pool = dirs.filter(d => ["vl","vr","hl","hm","hr"].includes(d.id));
   } else if(mode !== "seven"){
     // Existing 6-corner, sprint and split modes keep the original six positions.
     pool = dirs.filter(d => d.id !== "hm");
@@ -622,6 +646,7 @@ function doDirection(){
 
 function startTraining(){
   saveCurrentSettings();
+  updateModeTargets();
   unlockMediaAudio();
   if (parseFloat($("maxDelay").value) < parseFloat($("minDelay").value)){
     $("maxDelay").value = $("minDelay").value;
@@ -994,11 +1019,15 @@ $("historyBtn").onclick=showHistory;
 $("historyBackBtn").onclick=()=>{
   $("history").classList.add("hidden"); $("setup").classList.remove("hidden");
 };
-$("playerSelect").onchange=updatePlayerUI;
+$("playerSelect").onchange=()=>{ updatePlayerUI(); updateModeTargets(); };
 ["mode","duration","rounds","countdown","minDelay","maxDelay","rest","signal","vibrate"].forEach(id=>{
-  $(id).addEventListener("change",saveCurrentSettings);
+  $(id).addEventListener("change",()=>{
+    saveCurrentSettings();
+    if(id === "mode") updateModeTargets();
+  });
 });
 refreshPlayers();
+updateModeTargets();
 
 $("startBtn").onclick=startTraining;
 $("stopBtn").onclick=finishTraining;

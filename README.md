@@ -320,3 +320,15 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Die bisherigen Modi 6-Ecken, Explosive Sprints und Split-Step bleiben erhalten.
 - Versehentlich doppelte direkt aufeinanderfolgende HTML/JS-Zeilen aus dem Vorbuild bereinigt.
 - PWA-Cache auf speed-court-v1-12-0 aktualisiert.
+
+## V1.12.1
+- Neuer Modus „5-Punkte Footwork“: vorne links/rechts, hinten links/rechts und hinten Mitte.
+- Das Feldbild passt sich jetzt an den ausgewählten Modus an.
+- 4-Ecken zeigt nur die vier Eckpositionen.
+- 5-Punkte zeigt vier Ecken plus Hinten Mitte.
+- 6-Ecken, Explosive Sprints und Split-Step zeigen die ursprünglichen sechs Zielpunkte.
+- 7-Positionen zeigt alle sieben Zielpunkte.
+- Der zentrale Bereich bleibt in allen Modi sichtbar.
+- Die Anzeige aktualisiert sich sofort bei Änderung der Modusauswahl und nochmals beim Trainingsstart.
+- Audio-Dateien aus V1.12.0, einschließlich Hinten Mitte und neuer Pause, bleiben erhalten.
+- PWA-Cache aktualisiert.
