@@ -249,3 +249,13 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Ablauf: Richtungsansage → Position → BUM → Rückweg → MITTE → Pause → nächste Richtung.
 - Bluetooth-Medienausgabe bleibt erhalten.
 - Feldansicht und übrige Trainingslogik bleiben unverändert.
+
+## V1.10.5
+- Alle sechs Richtungsansagen verwenden die hochgeladenen weiblichen MP3-Dateien.
+- BUM und MITTE verwenden die hochgeladenen MP3-Dateien.
+- Pause verwendet „Pause Command.mp3“.
+- „Bereit machen. Nächste Runde.“ verwendet „Nächste Runde Bereit.mp3“.
+- „Training beendet.“ verwendet „Training Beendet.mp3“.
+- Audio-Test verwendet „Speed Court Test.mp3“.
+- Alle genannten MP3s sind direkt in index.html eingebettet; keine zusätzlichen Audio-Dateien auf GitHub nötig.
+- Der 3/5/10-Sekunden-Countdown bleibt technisch im exakten Sekundentakt, damit die auswählbaren Countdownlängen weiterhin korrekt funktionieren.
