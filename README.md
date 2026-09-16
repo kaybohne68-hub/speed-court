@@ -259,3 +259,10 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Audio-Test verwendet „Speed Court Test.mp3“.
 - Alle genannten MP3s sind direkt in index.html eingebettet; keine zusätzlichen Audio-Dateien auf GitHub nötig.
 - Der 3/5/10-Sekunden-Countdown bleibt technisch im exakten Sekundentakt, damit die auswählbaren Countdownlängen weiterhin korrekt funktionieren.
+
+## V1.10.6
+- „Vorne links“ wurde durch die neu hochgeladene korrekte Frauenstimmen-MP3 ersetzt.
+- „Countdown Start.mp3“ (3–2–1–Los) ist direkt in index.html eingebettet.
+- Bei 3-Sekunden-Startcountdown wird die kombinierte Frauenstimmen-Datei verwendet, sofern die Startlogik dies unterstützt.
+- Alle übrigen weiblichen Trainingsansagen aus V1.10.5 bleiben erhalten.
+- Neuer PWA-Cache speed-court-v1-10-6.
