@@ -301,3 +301,12 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Audio bleibt vom Zeitgeber getrennt und kann den Start nicht blockieren.
 - Zusätzlicher Sicherheitsstart bleibt aktiv.
 - PWA-Cache auf speed-court-v1-11-2 aktualisiert.
+
+## V1.11.3
+- Die hochgeladenen Einzeldateien für 10, 9, 8, 7, 6, 5, 4, 3, 2 und 1 sind direkt eingebettet.
+- Countdown spricht nun bei 10 Sekunden 10→1, bei 5 Sekunden 5→1 und bei 3 Sekunden 3→1.
+- Anzeige und Audio werden pro Sekunde gemeinsam ausgelöst.
+- Danach folgt LOS! und das Training startet.
+- Audio kann den Start weiterhin nicht blockieren.
+- Hinweis: Eine neue separate „Pause!“-MP3 wurde in diesem Upload noch nicht mitgeliefert; daher bleibt die bisherige Pause-Datei vorerst unverändert.
+- PWA-Cache auf speed-court-v1-11-3 aktualisiert.
