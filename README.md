@@ -266,3 +266,11 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Bei 3-Sekunden-Startcountdown wird die kombinierte Frauenstimmen-Datei verwendet, sofern die Startlogik dies unterstützt.
 - Alle übrigen weiblichen Trainingsansagen aus V1.10.5 bleiben erhalten.
 - Neuer PWA-Cache speed-court-v1-10-6.
+
+## V1.10.7
+- „Vorne links“ ersetzt durch „Position Vorne Links (1).mp3“.
+- countdownThenRound() korrigiert: Bei 3 Sekunden wird jetzt tatsächlich die hochgeladene „Countdown Start.mp3“ komplett abgespielt.
+- Die Runde startet erst nach dem Ende dieser MP3.
+- Veralteter doppelter Countdown-Helfer entfernt.
+- 5/10-Sekunden-Countdown bleibt im bisherigen Sekundentakt.
+- PWA-Cache auf speed-court-v1-10-7 geändert.
