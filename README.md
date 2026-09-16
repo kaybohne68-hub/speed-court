@@ -234,3 +234,10 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - ZB deutlich schneller und kürzer gesprochen.
 - Schutzzeit nach ZB auf 0,45 s verkürzt.
 - Trainingslogik und Feldansicht bleiben unverändert.
+
+## V1.10.3
+- Verzerrende, künstlich hochgepitchte Richtungsansagen aus V1.10.2 entfernt.
+- Sauberere Media-Sprachdateien für Richtungen/Countdown/Pausen wiederhergestellt.
+- Bluetooth-Medienausgabe bleibt aktiv.
+- BUM/ZB-Ablauf bleibt erhalten; ZB-Schutzzeit 0,55 s.
+- Zusätzlich wurde eine natürlichere KI-Sprachprobe mit dem Voice-Generator erstellt.
