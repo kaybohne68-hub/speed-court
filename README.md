@@ -241,3 +241,11 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Bluetooth-Medienausgabe bleibt aktiv.
 - BUM/ZB-Ablauf bleibt erhalten; ZB-Schutzzeit 0,55 s.
 - Zusätzlich wurde eine natürlichere KI-Sprachprobe mit dem Voice-Generator erstellt.
+
+## V1.10.4
+- ZB wurde im Trainingsablauf durch „MITTE!“ ersetzt.
+- Für „MITTE!“ wird exakt die vom Benutzer bereitgestellte MP3 „Mitte Area.mp3“ verwendet.
+- Die MP3 ist direkt in index.html eingebettet und benötigt keine zusätzliche Audiodatei auf GitHub.
+- Ablauf: Richtungsansage → Position → BUM → Rückweg → MITTE → Pause → nächste Richtung.
+- Bluetooth-Medienausgabe bleibt erhalten.
+- Feldansicht und übrige Trainingslogik bleiben unverändert.
