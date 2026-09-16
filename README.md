@@ -275,10 +275,11 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - 5/10-Sekunden-Countdown bleibt im bisherigen Sekundentakt.
 - PWA-Cache auf speed-court-v1-10-7 geändert.
 
-## V1.10.8
-- Neue hochgeladene Frauenstimmen-Datei „Countdown In German.mp3“ eingebettet.
-- Countdown-Auswahl 10 / 5 / 3 Sekunden bleibt erhalten.
-- Je nach Auswahl springt die App innerhalb der 10→1→Los-Aufnahme zum passenden Startpunkt.
-- Countdown und Trainingsstart sind gegen Audiofehler abgesichert: Audio kann den Trainingsstart nicht mehr blockieren.
-- Korrekte Vorne-links-Datei aus V1.10.7 bleibt erhalten.
-- PWA-Cache aktualisiert.
+## V1.11.0
+- Countdown-Startlogik vollständig neu aufgebaut.
+- Auswahl 3 / 5 / 10 Sekunden zählt wieder mit einem unabhängigen JavaScript-Sekundentimer.
+- Audio steuert den Trainingsstart nicht mehr und kann ihn daher nicht blockieren.
+- Zusätzliche Sicherheitsroutine startet die Runde auch bei Audio-/Bluetooth-Fehlern.
+- Die problematische lange Countdown-MP3-Seek-Logik aus V1.10.8 wurde verworfen.
+- Vorne-links-Korrektur und die übrigen Frauenstimmen-Audios aus V1.10.7 bleiben erhalten.
+- PWA-Cache auf V1.11.0 aktualisiert.
