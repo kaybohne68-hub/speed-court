@@ -310,3 +310,13 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Audio kann den Start weiterhin nicht blockieren.
 - Hinweis: Eine neue separate „Pause!“-MP3 wurde in diesem Upload noch nicht mitgeliefert; daher bleibt die bisherige Pause-Datei vorerst unverändert.
 - PWA-Cache auf speed-court-v1-11-3 aktualisiert.
+
+## V1.12.0
+- Neuer Modus „4-Ecken Footwork“: nur vorne links/rechts und hinten links/rechts.
+- Neuer Modus „7-Positionen Footwork“: die bisherigen sechs Positionen plus „Hinten Mitte“.
+- Neue sichtbare Position „Hinten Mitte“ mittig an der hinteren Grundlinie.
+- „Hinten Mitte.mp3“ direkt eingebettet.
+- „Pausee Discussion.mp3“ ersetzt die bisherige Pause-Ansage.
+- Die bisherigen Modi 6-Ecken, Explosive Sprints und Split-Step bleiben erhalten.
+- Versehentlich doppelte direkt aufeinanderfolgende HTML/JS-Zeilen aus dem Vorbuild bereinigt.
+- PWA-Cache auf speed-court-v1-12-0 aktualisiert.
