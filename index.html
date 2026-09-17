@@ -153,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev2</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev3</div>
     </header>
 
     <section id="setup" class="card">
@@ -330,7 +330,7 @@
 
 <script>
 const SC2={
- version:"2.0.0-dev2",
+ version:"2.0.0-dev3",
  settings:{uiLanguage:localStorage.getItem("sc2.uiLanguage")||"auto",voiceLanguage:localStorage.getItem("sc2.voiceLanguage")||"de"},
  features:{coreTraining:"FREE",footwork4:"FREE",footwork6:"FREE",footwork5:"PRO",footwork7:"PRO",explosiveSprints:"PRO",splitStepReaction:"PRO",advancedTiming:"PRO",multiplePlayers:"PRO",cameraCalibration:"PRO",liveCameraTracking:"PRO"},
  entitlement:localStorage.getItem("sc2.devEntitlement")||"FREE",
@@ -1117,6 +1117,108 @@ SC2.applyLanguage=function(){
  }
  document.documentElement.lang=lang;
 };
+</script>
+<script>
+SC2.fullTranslations={
+ en:{
+  "Training einstellen":"Set up training","Player/in":"Player","+ Neu":"+ New",
+  "Letztes Training":"Last training","Verlauf":"History","Player löschen":"Delete player",
+  "Mode":"Mode","Modus":"Mode","6-Ecken-Fußarbeit":"6-Corner Footwork","6-Ecken Footwork":"6-Corner Footwork",
+  "4-Ecken Footwork":"4-Corner Footwork","5-Punkte Footwork":"5-Point Footwork","7-Positionen Footwork":"7-Position Footwork",
+  "Explosive Sprints":"Explosive Sprints","Split-Step Reaktion":"Split-Step Reaction",
+  "Training duration":"Training duration","Trainingsdauer":"Training duration","Rounds":"Rounds","Runden":"Rounds",
+  "Start-Countdown":"Start countdown","Startsignal":"Start signal","Countdown + „Los!“":"Countdown + “Go!”",
+  "Minimale Reaktionszeit nach Schritt":"Minimum reaction time after Step",
+  "Maximale Reaktionszeit nach Schritt":"Maximum reaction time after Step",
+  "Min. Reaktionszeit nach Step":"Minimum reaction time after Step",
+  "Max. Reaktionszeit nach Step":"Maximum reaction time after Step",
+  "Mitte → Schritt":"Center → Step","Mitte → Step":"Center → Step",
+  "Round Reste":"Round rest","Round Reste":"Round rest","Round Rest":"Round rest","Rundenpause":"Round rest",
+  "Signal":"Signal","Sprache + Bildschirm":"Voice + screen","Voice + screen":"Voice + screen",
+  "Nur Sprache":"Voice only","Nur Bildschirm":"Screen only",
+  "Vibration":"Vibration","Offline nutzbar":"Available offline",
+  "Bluetooth / Audio testen":"Test Bluetooth / Audio",
+  "Speed Court 2.0":"Speed Court 2.0","App-Sprache":"App language","Trainingsansagen":"Training voice",
+  "FREE / PRO Testschalter":"FREE / PRO test switch","Training starten":"Start training","Training beenden":"End training",
+  "Runde":"Round","Signale":"Signals","aktive Zeit":"active time",
+  "Sekunden":"seconds","Sekunde":"second",
+  "Deutsch":"German","Automatisch":"Automatic","English":"English",
+  "NETZ":"NET","VORNE LINKS":"FRONT LEFT","VORNE RECHTS":"FRONT RIGHT","MITTE LINKS":"MIDDLE LEFT",
+  "MITTE RECHTS":"MIDDLE RIGHT","HINTEN LINKS":"BACK LEFT","HINTEN MITTE":"BACK CENTER","HINTEN RECHTS":"BACK RIGHT",
+  "Pause":"Pause","Training":"Training","Fertig":"Finished"
+ },
+ de:{}
+};
+
+SC2.translateString=function(source,lang){
+ if(lang==="de") return source;
+ const d=this.fullTranslations.en;
+ let s=source;
+ // Exact match first.
+ if(d[s]!==undefined)return d[s];
+ // Dynamic phrases/values.
+ s=s.replace(/^Letztes Training:/,"Last training:")
+    .replace(/(\d+)\s+Signals\b/g,"$1 signals")
+    .replace(/(\d+)\s+Rounds\b/g,"$1 rounds")
+    .replace(/(\d+)\s+Runden\b/g,"$1 rounds")
+    .replace(/\bSekunden\b/g,"seconds")
+    .replace(/\bSekunde\b/g,"second")
+    .replace(/^Minimale Reaktionszeit nach Schritt:/,"Minimum reaction time after Step:")
+    .replace(/^Maximale Reaktionszeit nach Schritt:/,"Maximum reaction time after Step:")
+    .replace(/^Min\. Reaktionszeit nach Step:/,"Minimum reaction time after Step:")
+    .replace(/^Max\. Reaktionszeit nach Step:/,"Maximum reaction time after Step:")
+    .replace(/^Mitte → Schritt:/,"Center → Step:")
+    .replace(/^Mitte → Step:/,"Center → Step:")
+    .replace(/^Runde (\d+) \/ (\d+)/,"Round $1 / $2")
+    .replace(/^Aktiver Entwicklungsstatus:/,"Active developer status:")
+    .replace(/Noch keine echte Bezahlung\./g,"No real payment yet.");
+ // Exact phrases embedded in labels/buttons.
+ const keys=Object.keys(d).sort((a,b)=>b.length-a.length);
+ for(const k of keys)if(s.includes(k))s=s.split(k).join(d[k]);
+ return s;
+};
+
+SC2.applyLanguageV3=function(){
+ const lang=this.effectiveUiLanguage();
+ if(!this._v3orig)this._v3orig=new WeakMap();
+
+ // All text nodes.
+ const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
+ while(n=w.nextNode()){
+   if(!n.parentElement||["SCRIPT","STYLE"].includes(n.parentElement.tagName))continue;
+   let original=this._v3orig.get(n);
+   if(original===undefined){original=n.nodeValue;this._v3orig.set(n,original);}
+   const lead=original.match(/^\s*/)?.[0]||"",tail=original.match(/\s*$/)?.[0]||"",core=original.trim();
+   if(core)n.nodeValue=lead+(lang==="en"?this.translateString(core,"en"):core)+tail;
+ }
+
+ // Explicitly translate every select option from its original label.
+ document.querySelectorAll("option").forEach(o=>{
+   if(!o.dataset.sc2Original)o.dataset.sc2Original=o.textContent;
+   o.textContent=lang==="en"?this.translateString(o.dataset.sc2Original,"en"):o.dataset.sc2Original;
+ });
+
+ // Inputs/buttons with value/title/placeholder.
+ document.querySelectorAll("[placeholder],[title],input[type=button],input[type=submit]").forEach(el=>{
+   ["placeholder","title","value"].forEach(a=>{
+     if(!el.hasAttribute(a))return;
+     const key="sc2Original"+a[0].toUpperCase()+a.slice(1);
+     if(!el.dataset[key])el.dataset[key]=el.getAttribute(a);
+     el.setAttribute(a,lang==="en"?this.translateString(el.dataset[key],"en"):el.dataset[key]);
+   });
+ });
+ document.documentElement.lang=lang;
+};
+
+// V3 supersedes the dev2 translator.
+SC2.applyLanguage=SC2.applyLanguageV3;
+</script>
+<script>
+window.addEventListener("load",()=>{
+ SC2.applyLanguageV3();
+ const u=document.getElementById("sc2UiLanguage");
+ if(u)u.addEventListener("change",()=>setTimeout(()=>SC2.applyLanguageV3(),0));
+});
 </script>
 </body>
 </html>
