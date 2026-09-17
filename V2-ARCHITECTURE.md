@@ -2,3 +2,6 @@
 Basis: V1.12.2.
 Neu: zentrale FREE/PRO-Berechtigungen, separater UI-/Ansagen-Sprachstatus, Deutsch/Englisch-Grundstruktur und Entwickler-Testschalter.
 Noch nicht enthalten: echte Käufe/Abos, Store-Codes, englisches Audiopaket, vollständige Übersetzung, Kamera.
+
+## Dev 2
+Aktive Deutsch/Englisch-Umschaltung der bestehenden Oberfläche; Ansagensprache bleibt separat.
