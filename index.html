@@ -153,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 1.12.2</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev1</div>
     </header>
 
     <section id="setup" class="card">
@@ -263,7 +263,13 @@
       </div>
 
       <button id="audioTestBtn" class="secondary" style="margin-bottom:10px">🎧 Bluetooth / Audio testen</button>
-      <button id="startBtn" class="primary">Training starten</button>
+      <section id="sc2Foundation" class="card" style="margin-top:16px">
+<h2>Speed Court 2.0</h2><div class="grid2">
+<div><label>App-Sprache</label><select id="sc2UiLanguage"><option value="auto">Automatisch</option><option value="de">Deutsch</option><option value="en">English</option></select></div>
+<div><label>Trainingsansagen</label><select id="sc2VoiceLanguage"><option value="de">Deutsch</option><option value="en">English</option></select></div></div>
+<div style="margin-top:12px"><label>FREE / PRO Testschalter</label><select id="sc2Entitlement"><option>FREE</option><option>PRO</option></select>
+<div class="muted">Aktiver Entwicklungsstatus: <strong id="sc2EntitlementBadge">FREE</strong>. Noch keine echte Bezahlung.</div></div></section>
+<button id="startBtn" class="primary">Training starten</button>
       <p class="tiny">Tipp: Handy seitlich am Feld oder am Netzpfosten platzieren. In einer lauten Halle hilft ein Bluetooth-Lautsprecher.</p>
     </section>
 
@@ -322,6 +328,24 @@
     </section>
   </main>
 
+<script>
+const SC2={
+ version:"2.0.0-dev1",
+ settings:{uiLanguage:localStorage.getItem("sc2.uiLanguage")||"auto",voiceLanguage:localStorage.getItem("sc2.voiceLanguage")||"de"},
+ features:{coreTraining:"FREE",footwork4:"FREE",footwork6:"FREE",footwork5:"PRO",footwork7:"PRO",explosiveSprints:"PRO",splitStepReaction:"PRO",advancedTiming:"PRO",multiplePlayers:"PRO",cameraCalibration:"PRO",liveCameraTracking:"PRO"},
+ entitlement:localStorage.getItem("sc2.devEntitlement")||"FREE",
+ setEntitlement(v){this.entitlement=v==="PRO"?"PRO":"FREE";localStorage.setItem("sc2.devEntitlement",this.entitlement);this.refresh();},
+ hasFeature(k){return (this.features[k]||"FREE")==="FREE"||this.entitlement==="PRO";},
+ effectiveUiLanguage(){if(this.settings.uiLanguage!=="auto")return this.settings.uiLanguage;return (navigator.language||"de").toLowerCase().startsWith("de")?"de":"en";},
+ i18n:{
+  de:{uiLanguage:"App-Sprache",voiceLanguage:"Trainingsansagen",automatic:"Automatisch",german:"Deutsch",english:"English",free:"FREE",pro:"PRO"},
+  en:{uiLanguage:"App language",voiceLanguage:"Training voice",automatic:"Automatic",german:"Deutsch",english:"English",free:"FREE",pro:"PRO"}
+ },
+ t(k){let l=this.effectiveUiLanguage();return this.i18n[l]?.[k]||this.i18n.de[k]||k;},
+ save(){localStorage.setItem("sc2.uiLanguage",this.settings.uiLanguage);localStorage.setItem("sc2.voiceLanguage",this.settings.voiceLanguage);},
+ refresh(){let b=document.getElementById("sc2EntitlementBadge"),e=document.getElementById("sc2Entitlement");if(b)b.textContent=this.entitlement;if(e)e.value=this.entitlement;}
+};
+</script>
 <script>
 const dirs = [
   {id:"vl", label:"Vorne links"},
@@ -1062,5 +1086,14 @@ if ("serviceWorker" in navigator) {
   <div id="countdownNumber" style="font-size:min(34vw,220px);line-height:1;">3</div>
   <div style="font-size:clamp(18px,4vw,34px);margin-top:18px;">TRAINING STARTET</div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const u=document.getElementById("sc2UiLanguage"),v=document.getElementById("sc2VoiceLanguage"),e=document.getElementById("sc2Entitlement");
+ if(u){u.value=SC2.settings.uiLanguage;u.onchange=()=>{SC2.settings.uiLanguage=u.value;SC2.save();};}
+ if(v){v.value=SC2.settings.voiceLanguage;v.onchange=()=>{SC2.settings.voiceLanguage=v.value;SC2.save();};}
+ if(e){e.value=SC2.entitlement;e.onchange=()=>SC2.setEntitlement(e.value);}
+ SC2.refresh();
+});
+</script>
 </body>
 </html>
