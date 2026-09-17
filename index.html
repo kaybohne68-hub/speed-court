@@ -153,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev3</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev4</div>
     </header>
 
     <section id="setup" class="card">
@@ -175,9 +175,9 @@
 
       <label for="mode">Modus</label>
       <select id="mode">
-        <option value="footwork">6-Ecken Footwork</option>
         <option value="four">4-Ecken Footwork</option>
         <option value="five">5-Punkte Footwork</option>
+        <option value="footwork">6-Ecken Footwork</option>
         <option value="seven">7-Positionen Footwork</option>
         <option value="sprint">Explosive Sprints</option>
         <option value="split">Split-Step Reaktion</option>
@@ -330,7 +330,7 @@
 
 <script>
 const SC2={
- version:"2.0.0-dev3",
+ version:"2.0.0-dev4",
  settings:{uiLanguage:localStorage.getItem("sc2.uiLanguage")||"auto",voiceLanguage:localStorage.getItem("sc2.voiceLanguage")||"de"},
  features:{coreTraining:"FREE",footwork4:"FREE",footwork6:"FREE",footwork5:"PRO",footwork7:"PRO",explosiveSprints:"PRO",splitStepReaction:"PRO",advancedTiming:"PRO",multiplePlayers:"PRO",cameraCalibration:"PRO",liveCameraTracking:"PRO"},
  entitlement:localStorage.getItem("sc2.devEntitlement")||"FREE",
@@ -1089,136 +1089,85 @@ if ("serviceWorker" in navigator) {
 <script>
 document.addEventListener("DOMContentLoaded",()=>{
  const u=document.getElementById("sc2UiLanguage"),v=document.getElementById("sc2VoiceLanguage"),e=document.getElementById("sc2Entitlement");
- if(u){u.value=SC2.settings.uiLanguage;u.onchange=()=>{SC2.settings.uiLanguage=u.value;SC2.save();SC2.applyLanguage();};}
+ if(u){u.value=SC2.settings.uiLanguage;u.onchange=()=>{SC2.settings.uiLanguage=u.value;SC2.save();SC2.renderLocale();};}
  if(v){v.value=SC2.settings.voiceLanguage;v.onchange=()=>{SC2.settings.voiceLanguage=v.value;SC2.save();};}
  if(e){e.value=SC2.entitlement;e.onchange=()=>SC2.setEntitlement(e.value);}
  SC2.refresh();
- SC2.applyLanguage();
+ SC2.renderLocale();
 });
 </script>
 <script>
-SC2.translations={
-de:{"Modus":"Modus","6-Ecken Footwork":"6-Ecken Footwork","4-Ecken Footwork":"4-Ecken Footwork","5-Punkte Footwork":"5-Punkte Footwork","7-Positionen Footwork":"7-Positionen Footwork","Explosive Sprints":"Explosive Sprints","Split-Step Reaktion":"Split-Step Reaktion","3 Sekunden":"3 Sekunden","5 Sekunden":"5 Sekunden","10 Sekunden":"10 Sekunden","Min. Pause":"Min. Reaktionszeit nach Step","Max. Pause":"Max. Reaktionszeit nach Step","Rundenpause":"Rundenpause","Signal":"Signal","Sprache + Bildschirm":"Sprache + Bildschirm","Nur Sprache":"Nur Sprache","Nur Bildschirm":"Nur Bildschirm","Vibration":"Vibration","Offline nutzbar":"Offline nutzbar","Bluetooth / Audio testen":"Bluetooth / Audio testen","App-Sprache":"App-Sprache","Trainingsansagen":"Trainingsansagen","FREE / PRO Testschalter":"FREE / PRO Testschalter","Training starten":"Training starten","Training beenden":"Training beenden","Runde":"Runde","Signale":"Signale","aktive Zeit":"aktive Zeit","NETZ":"NETZ","VORNE LINKS":"VORNE LINKS","VORNE RECHTS":"VORNE RECHTS","MITTE LINKS":"MITTE LINKS","MITTE RECHTS":"MITTE RECHTS","HINTEN LINKS":"HINTEN LINKS","HINTEN MITTE":"HINTEN MITTE","HINTEN RECHTS":"HINTEN RECHTS","Automatisch":"Automatisch","Deutsch":"Deutsch","English":"English","Spieler":"Spieler","Runden":"Runden","Trainingsdauer":"Trainingsdauer"},
-en:{"Modus":"Mode","6-Ecken Footwork":"6-Corner Footwork","4-Ecken Footwork":"4-Corner Footwork","5-Punkte Footwork":"5-Point Footwork","7-Positionen Footwork":"7-Position Footwork","Explosive Sprints":"Explosive Sprints","Split-Step Reaktion":"Split-Step Reaction","3 Sekunden":"3 seconds","5 Sekunden":"5 seconds","10 Sekunden":"10 seconds","Min. Pause":"Min. reaction time after Step","Max. Pause":"Max. reaction time after Step","Rundenpause":"Round rest","Signal":"Signal","Sprache + Bildschirm":"Voice + screen","Nur Sprache":"Voice only","Nur Bildschirm":"Screen only","Vibration":"Vibration","Offline nutzbar":"Available offline","Bluetooth / Audio testen":"Test Bluetooth / Audio","App-Sprache":"App language","Trainingsansagen":"Training voice","FREE / PRO Testschalter":"FREE / PRO test switch","Training starten":"Start training","Training beenden":"End training","Runde":"Round","Signale":"Signals","aktive Zeit":"active time","NETZ":"NET","VORNE LINKS":"FRONT LEFT","VORNE RECHTS":"FRONT RIGHT","MITTE LINKS":"MIDDLE LEFT","MITTE RECHTS":"MIDDLE RIGHT","HINTEN LINKS":"BACK LEFT","HINTEN MITTE":"BACK CENTER","HINTEN RECHTS":"BACK RIGHT","Automatisch":"Automatic","Deutsch":"German","English":"English","Spieler":"Player","Runden":"Rounds","Trainingsdauer":"Training duration"}};
-SC2._orig=new WeakMap();
-SC2.applyLanguage=function(){
- const lang=this.effectiveUiLanguage(),dict=this.translations[lang]||this.translations.de;
- const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
- while(n=w.nextNode()){
-  if(!n.parentElement||["SCRIPT","STYLE"].includes(n.parentElement.tagName))continue;
-  let o=this._orig.get(n);if(o===undefined){o=n.nodeValue;this._orig.set(n,o)}
-  let t=o.trim();if(!t)continue;let x=dict[t];
-  if(x===undefined){
-   x=t;
-   for(const k of Object.keys(dict).sort((a,b)=>b.length-a.length))if(x.includes(k))x=x.split(k).join(dict[k]);
-   if(lang==="en")x=x.replace(/Aktiver Entwicklungsstatus:/g,"Active developer status:").replace(/Noch keine echte Bezahlung\./g,"No real payment yet.").replace(/Sekunden/g,"seconds").replace(/Runde (\d+) \/ (\d+)/g,"Round $1 / $2");
-  }
-  n.nodeValue=(o.match(/^\s*/)?.[0]||"")+x+(o.match(/\s*$/)?.[0]||"");
- }
- document.documentElement.lang=lang;
-};
-</script>
-<script>
-SC2.fullTranslations={
- en:{
-  "Training einstellen":"Set up training","Player/in":"Player","+ Neu":"+ New",
-  "Letztes Training":"Last training","Verlauf":"History","Player löschen":"Delete player",
-  "Mode":"Mode","Modus":"Mode","6-Ecken-Fußarbeit":"6-Corner Footwork","6-Ecken Footwork":"6-Corner Footwork",
-  "4-Ecken Footwork":"4-Corner Footwork","5-Punkte Footwork":"5-Point Footwork","7-Positionen Footwork":"7-Position Footwork",
-  "Explosive Sprints":"Explosive Sprints","Split-Step Reaktion":"Split-Step Reaction",
-  "Training duration":"Training duration","Trainingsdauer":"Training duration","Rounds":"Rounds","Runden":"Rounds",
-  "Start-Countdown":"Start countdown","Startsignal":"Start signal","Countdown + „Los!“":"Countdown + “Go!”",
-  "Minimale Reaktionszeit nach Schritt":"Minimum reaction time after Step",
-  "Maximale Reaktionszeit nach Schritt":"Maximum reaction time after Step",
-  "Min. Reaktionszeit nach Step":"Minimum reaction time after Step",
-  "Max. Reaktionszeit nach Step":"Maximum reaction time after Step",
-  "Mitte → Schritt":"Center → Step","Mitte → Step":"Center → Step",
-  "Round Reste":"Round rest","Round Reste":"Round rest","Round Rest":"Round rest","Rundenpause":"Round rest",
-  "Signal":"Signal","Sprache + Bildschirm":"Voice + screen","Voice + screen":"Voice + screen",
-  "Nur Sprache":"Voice only","Nur Bildschirm":"Screen only",
-  "Vibration":"Vibration","Offline nutzbar":"Available offline",
-  "Bluetooth / Audio testen":"Test Bluetooth / Audio",
-  "Speed Court 2.0":"Speed Court 2.0","App-Sprache":"App language","Trainingsansagen":"Training voice",
-  "FREE / PRO Testschalter":"FREE / PRO test switch","Training starten":"Start training","Training beenden":"End training",
-  "Runde":"Round","Signale":"Signals","aktive Zeit":"active time",
-  "Sekunden":"seconds","Sekunde":"second",
-  "Deutsch":"German","Automatisch":"Automatic","English":"English",
-  "NETZ":"NET","VORNE LINKS":"FRONT LEFT","VORNE RECHTS":"FRONT RIGHT","MITTE LINKS":"MIDDLE LEFT",
-  "MITTE RECHTS":"MIDDLE RIGHT","HINTEN LINKS":"BACK LEFT","HINTEN MITTE":"BACK CENTER","HINTEN RECHTS":"BACK RIGHT",
-  "Pause":"Pause","Training":"Training","Fertig":"Finished"
+SC2.locale={
+ de:{
+  setup:"Training einstellen", player:"Spieler/in", newPlayer:"+ Neu", lastTraining:"Letztes Training",
+  history:"Verlauf", deletePlayer:"Spieler löschen", mode:"Modus", duration:"Trainingsdauer",
+  rounds:"Runden", startCountdown:"Start-Countdown", startSignal:"Startsignal",
+  minReaction:"Min. Reaktionszeit nach Step", maxReaction:"Max. Reaktionszeit nach Step",
+  centerStep:"Mitte → Step", roundRest:"Rundenpause", signal:"Signal", vibration:"Vibration",
+  offline:"Offline nutzbar", audioTest:"Bluetooth / Audio testen", appLanguage:"App-Sprache",
+  voiceLanguage:"Trainingsansagen", devSwitch:"FREE / PRO Testschalter",
+  activeDev:"Aktiver Entwicklungsstatus:", noPayment:"Noch keine echte Bezahlung.",
+  start:"Training starten", end:"Training beenden", signals:"Signale", activeTime:"aktive Zeit", round:"Runde",
+  mode_four:"4-Ecken Footwork", mode_five:"5-Punkte Footwork", mode_footwork:"6-Ecken Footwork",
+  mode_seven:"7-Positionen Footwork", mode_sprint:"Explosive Sprints", mode_split:"Split-Step Reaktion",
+  voiceScreen:"Sprache + Bildschirm", voiceOnly:"Nur Sprache", screenOnly:"Nur Bildschirm",
+  auto:"Automatisch", german:"Deutsch", english:"English", net:"NETZ",
+  vl:"VORNE LINKS",vr:"VORNE RECHTS",ml:"MITTE LINKS",mr:"MITTE RECHTS",hl:"HINTEN LINKS",hm:"HINTEN MITTE",hr:"HINTEN RECHTS"
  },
- de:{}
-};
-
-SC2.translateString=function(source,lang){
- if(lang==="de") return source;
- const d=this.fullTranslations.en;
- let s=source;
- // Exact match first.
- if(d[s]!==undefined)return d[s];
- // Dynamic phrases/values.
- s=s.replace(/^Letztes Training:/,"Last training:")
-    .replace(/(\d+)\s+Signals\b/g,"$1 signals")
-    .replace(/(\d+)\s+Rounds\b/g,"$1 rounds")
-    .replace(/(\d+)\s+Runden\b/g,"$1 rounds")
-    .replace(/\bSekunden\b/g,"seconds")
-    .replace(/\bSekunde\b/g,"second")
-    .replace(/^Minimale Reaktionszeit nach Schritt:/,"Minimum reaction time after Step:")
-    .replace(/^Maximale Reaktionszeit nach Schritt:/,"Maximum reaction time after Step:")
-    .replace(/^Min\. Reaktionszeit nach Step:/,"Minimum reaction time after Step:")
-    .replace(/^Max\. Reaktionszeit nach Step:/,"Maximum reaction time after Step:")
-    .replace(/^Mitte → Schritt:/,"Center → Step:")
-    .replace(/^Mitte → Step:/,"Center → Step:")
-    .replace(/^Runde (\d+) \/ (\d+)/,"Round $1 / $2")
-    .replace(/^Aktiver Entwicklungsstatus:/,"Active developer status:")
-    .replace(/Noch keine echte Bezahlung\./g,"No real payment yet.");
- // Exact phrases embedded in labels/buttons.
- const keys=Object.keys(d).sort((a,b)=>b.length-a.length);
- for(const k of keys)if(s.includes(k))s=s.split(k).join(d[k]);
- return s;
-};
-
-SC2.applyLanguageV3=function(){
- const lang=this.effectiveUiLanguage();
- if(!this._v3orig)this._v3orig=new WeakMap();
-
- // All text nodes.
- const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
- while(n=w.nextNode()){
-   if(!n.parentElement||["SCRIPT","STYLE"].includes(n.parentElement.tagName))continue;
-   let original=this._v3orig.get(n);
-   if(original===undefined){original=n.nodeValue;this._v3orig.set(n,original);}
-   const lead=original.match(/^\s*/)?.[0]||"",tail=original.match(/\s*$/)?.[0]||"",core=original.trim();
-   if(core)n.nodeValue=lead+(lang==="en"?this.translateString(core,"en"):core)+tail;
+ en:{
+  setup:"Set up training", player:"Player", newPlayer:"+ New", lastTraining:"Last training",
+  history:"History", deletePlayer:"Delete player", mode:"Mode", duration:"Training duration",
+  rounds:"Rounds", startCountdown:"Start countdown", startSignal:"Start signal",
+  minReaction:"Min. reaction time after Step", maxReaction:"Max. reaction time after Step",
+  centerStep:"Center → Step", roundRest:"Round rest", signal:"Signal", vibration:"Vibration",
+  offline:"Available offline", audioTest:"Test Bluetooth / Audio", appLanguage:"App language",
+  voiceLanguage:"Training voice", devSwitch:"FREE / PRO test switch",
+  activeDev:"Active developer status:", noPayment:"No real payment yet.",
+  start:"Start training", end:"End training", signals:"Signals", activeTime:"active time", round:"Round",
+  mode_four:"4-Corner Footwork", mode_five:"5-Point Footwork", mode_footwork:"6-Corner Footwork",
+  mode_seven:"7-Position Footwork", mode_sprint:"Explosive Sprints", mode_split:"Split-Step Reaction",
+  voiceScreen:"Voice + screen", voiceOnly:"Voice only", screenOnly:"Screen only",
+  auto:"Automatic", german:"German", english:"English", net:"NET",
+  vl:"FRONT LEFT",vr:"FRONT RIGHT",ml:"MIDDLE LEFT",mr:"MIDDLE RIGHT",hl:"BACK LEFT",hm:"BACK CENTER",hr:"BACK RIGHT"
  }
+};
+SC2.renderLocale=function(){
+ const lang=this.effectiveUiLanguage(), t=this.locale[lang]||this.locale.de;
+ const setText=(sel,val)=>{const e=document.querySelector(sel);if(e)e.textContent=val;};
+ const setLabel=(forId,val)=>{const e=document.querySelector('label[for="'+forId+'"]');if(e){
+   // Preserve live value span if present.
+   const span=e.querySelector("span"); e.childNodes[0].nodeValue=val+(span?": ":""); if(!span)e.textContent=val;
+ }};
+ // Stable IDs/structural selectors only; no automatic word substitution.
+ setText("main h2",t.setup);
+ setLabel("playerSelect",t.player); setText("#addPlayerBtn",t.newPlayer);
+ setText("#historyBtn",t.history); setText("#deletePlayerBtn",t.deletePlayer);
+ setLabel("mode",t.mode); setLabel("duration",t.duration); setLabel("rounds",t.rounds);
+ setLabel("countdown",t.startCountdown); setLabel("minDelay",t.minReaction); setLabel("maxDelay",t.maxReaction);
+ setLabel("stepDelay",t.centerStep); setLabel("rest",t.roundRest); setLabel("signal",t.signal);
+ setLabel("sc2UiLanguage",t.appLanguage); setLabel("sc2VoiceLanguage",t.voiceLanguage);
+ setText("#startBtn",t.start); setText("#stopBtn",t.end);
+ setText("#audioTestBtn",t.audioTest);
 
- // Explicitly translate every select option from its original label.
- document.querySelectorAll("option").forEach(o=>{
-   if(!o.dataset.sc2Original)o.dataset.sc2Original=o.textContent;
-   o.textContent=lang==="en"?this.translateString(o.dataset.sc2Original,"en"):o.dataset.sc2Original;
+ const mode=document.getElementById("mode");
+ if(mode) [...mode.options].forEach(o=>{const k="mode_"+o.value;if(t[k])o.textContent=t[k];});
+ const sig=document.getElementById("signal");
+ if(sig) [...sig.options].forEach(o=>{
+   if(o.value==="both")o.textContent=t.voiceScreen;
+   else if(o.value==="voice")o.textContent=t.voiceOnly;
+   else if(o.value==="screen")o.textContent=t.screenOnly;
  });
+ const ui=document.getElementById("sc2UiLanguage");
+ if(ui){ui.options[0].textContent=t.auto;ui.options[1].textContent=t.german;ui.options[2].textContent=t.english;}
+ const voice=document.getElementById("sc2VoiceLanguage");
+ if(voice){voice.options[0].textContent=t.german;voice.options[1].textContent=t.english;}
 
- // Inputs/buttons with value/title/placeholder.
- document.querySelectorAll("[placeholder],[title],input[type=button],input[type=submit]").forEach(el=>{
-   ["placeholder","title","value"].forEach(a=>{
-     if(!el.hasAttribute(a))return;
-     const key="sc2Original"+a[0].toUpperCase()+a.slice(1);
-     if(!el.dataset[key])el.dataset[key]=el.getAttribute(a);
-     el.setAttribute(a,lang==="en"?this.translateString(el.dataset[key],"en"):el.dataset[key]);
-   });
- });
+ const targets={vl:t.vl,vr:t.vr,ml:t.ml,mr:t.mr,hl:t.hl,hm:t.hm,hr:t.hr};
+ document.querySelectorAll(".target[data-dir]").forEach(e=>{if(targets[e.dataset.dir])e.innerHTML=targets[e.dataset.dir].replace(" ","<br>");});
+ const net=[...document.querySelectorAll("*")].find(e=>e.children.length===0 && e.textContent.trim()==="NETZ");
+ if(net&&lang==="en")net.textContent=t.net;
  document.documentElement.lang=lang;
 };
-
-// V3 supersedes the dev2 translator.
-SC2.applyLanguage=SC2.applyLanguageV3;
-</script>
-<script>
-window.addEventListener("load",()=>{
- SC2.applyLanguageV3();
- const u=document.getElementById("sc2UiLanguage");
- if(u)u.addEventListener("change",()=>setTimeout(()=>SC2.applyLanguageV3(),0));
-});
 </script>
 </body>
 </html>

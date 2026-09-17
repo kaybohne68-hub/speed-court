@@ -11,3 +11,11 @@ Aktive Deutsch/Englisch-Umschaltung der bestehenden Oberfläche; Ansagensprache 
 - Select-/Dropdown-Optionen werden separat aus ihren Originalwerten übersetzt.
 - Dynamische Werte wie Sekunden, Runden, Reaktionszeit und letzter Trainingsstatus werden übersetzt.
 - UI-Sprache und Trainingsansagensprache bleiben unabhängig.
+
+## Dev 4
+- Automatische Wort-/Text-Ersetzung aus Dev2/Dev3 entfernt.
+- Stabile, explizite Deutsch/Englisch-Begriffe über feste UI-Ziele.
+- Keine Umbenennung von „Training“ zu „Schulung“ oder „Mitte“ zu „Zentrum“.
+- Modusauswahl logisch sortiert: 4-Ecken, 5-Punkte, 6-Ecken, 7-Positionen, Explosive Sprints, Split-Step Reaktion.
+- Interne Moduswerte und Trainingslogik bleiben unverändert.
+- Dropdown-Modusnamen werden direkt aus festen Sprachwerten gesetzt.
