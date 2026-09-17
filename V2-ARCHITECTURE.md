@@ -19,3 +19,11 @@ Aktive Deutsch/Englisch-Umschaltung der bestehenden Oberfläche; Ansagensprache 
 - Modusauswahl logisch sortiert: 4-Ecken, 5-Punkte, 6-Ecken, 7-Positionen, Explosive Sprints, Split-Step Reaktion.
 - Interne Moduswerte und Trainingslogik bleiben unverändert.
 - Dropdown-Modusnamen werden direkt aus festen Sprachwerten gesetzt.
+
+## Dev 5
+- Eine einzige verbindliche I18N-Quelle (SC2.I18N).
+- Keine automatische Wortübersetzung mehr.
+- Startbutton, Sprachfelder, FREE/PRO-Schalter und Statuszeile fest DE/EN definiert.
+- Dropdowns werden anhand ihrer stabilen internen Werte übersetzt.
+- Modusreihenfolge bleibt 4, 5, 6, 7, Explosive Sprints, Split-Step.
+- UI- und Ansagensprache bleiben getrennt.
