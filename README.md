@@ -332,3 +332,12 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Die Anzeige aktualisiert sich sofort bei Änderung der Modusauswahl und nochmals beim Trainingsstart.
 - Audio-Dateien aus V1.12.0, einschließlich Hinten Mitte und neuer Pause, bleiben erhalten.
 - PWA-Cache aktualisiert.
+
+## V1.12.2
+- Neue Frauenstimmen-Audiodatei „Step Instructions.mp3“ direkt eingebettet.
+- Neuer Regler „Mitte → Step“ von 0,0 bis 2,0 Sekunden in 0,1-s-Schritten; Standard 0,5 s.
+- Neuer Bewegungsablauf: Position → BUM → MITTE → einstellbare Mitte-Step-Zeit → STEP → zufällige Reaktionspause → nächste Richtung.
+- Mitte-Step-Zeit wird in Spielerprofilen/Einstellungen gespeichert.
+- Audio bleibt vom Zeitgeber getrennt, damit Bluetooth-/Audiofehler den Trainingsablauf nicht blockieren.
+- Alle sechs Modi und die dynamische Zielpunktanzeige aus V1.12.1 bleiben erhalten.
+- PWA-Cache aktualisiert.
