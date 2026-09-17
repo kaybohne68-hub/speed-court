@@ -27,3 +27,11 @@ Aktive Deutsch/Englisch-Umschaltung der bestehenden Oberfläche; Ansagensprache 
 - Dropdowns werden anhand ihrer stabilen internen Werte übersetzt.
 - Modusreihenfolge bleibt 4, 5, 6, 7, Explosive Sprints, Split-Step.
 - UI- und Ansagensprache bleiben getrennt.
+
+## Dev 6
+- Alte dev2–dev5-Übersetzungsschichten aus der ausgelieferten Seite entfernt.
+- SC6 ist die einzige aktive UI-Lokalisierung.
+- Sprachwechsel rendert sofort Deutsch/Englisch.
+- Dropdowns werden anhand stabiler interner Werte übersetzt.
+- Ansagensprache bleibt unabhängig von der App-Sprache.
+- FREE/PRO-Status, Startbutton und Tipp werden explizit lokalisiert.
