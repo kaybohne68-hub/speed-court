@@ -341,3 +341,8 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Audio bleibt vom Zeitgeber getrennt, damit Bluetooth-/Audiofehler den Trainingsablauf nicht blockieren.
 - Alle sechs Modi und die dynamische Zielpunktanzeige aus V1.12.1 bleiben erhalten.
 - PWA-Cache aktualisiert.
+
+## dev8
+- Screen Wake Lock während des aktiven Trainings.
+- Nach dem Aufwecken wird der Wake Lock erneut angefordert.
+- Neuer Service-Worker-Cache für dev8.

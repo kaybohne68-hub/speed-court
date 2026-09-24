@@ -153,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev7</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev8</div>
     </header>
 
     <section id="setup" class="card">
@@ -329,5 +329,54 @@ en:{appLanguage:"App language",voiceLanguage:"Training voice",devSwitch:"FREE / 
 lang(){let v=document.getElementById("sc7Ui")?.value||localStorage.getItem("sc7.ui")||"auto";return v==="auto"?((navigator.language||"de").toLowerCase().startsWith("de")?"de":"en"):v},t(k){return this.d[this.lang()][k]||k},
 render(){document.querySelectorAll("#sc7Settings [data-k]").forEach(e=>e.textContent=this.t(e.dataset.k));let set=(id,k)=>{let e=document.getElementById(id);if(e)e.textContent=this.t(k)};set("startBtn","start");set("historyBtn","history");set("deletePlayerBtn","del");set("addPlayerBtn","add");set("audioTestBtn","audio");for(const [id,k] of Object.entries({mode:"mode",duration:"duration",rounds:"rounds",countdown:"countdown",rest:"rest",signal:"signal"})){let e=document.querySelector('label[for="'+id+'"]');if(e)e.textContent=this.t(k)}let m=document.getElementById("mode");if(m)[...m.options].forEach(o=>{if(this.d.de[o.value])o.textContent=this.t(o.value)});let s=document.getElementById("signal");if(s)[...s.options].forEach(o=>{if(["both","voice","screen"].includes(o.value))o.textContent=this.t(o.value)});let x=document.getElementById("sc7Pro")?.value||"FREE";document.getElementById("sc7Status").textContent=this.t("status").replace("{x}",x);document.querySelectorAll("h2").forEach(e=>{if(/Training einstellen|Set up training/.test(e.textContent))e.textContent=this.t("setup")});document.documentElement.lang=this.lang()},
 init(){let u=document.getElementById("sc7Ui"),v=document.getElementById("sc7Voice"),p=document.getElementById("sc7Pro");u.value=localStorage.getItem("sc7.ui")||"auto";v.value=localStorage.getItem("sc7.voice")||"de";p.value=localStorage.getItem("sc7.pro")||"FREE";u.onchange=()=>{localStorage.setItem("sc7.ui",u.value);this.render()};v.onchange=()=>localStorage.setItem("sc7.voice",v.value);p.onchange=()=>{localStorage.setItem("sc7.pro",p.value);this.render()};this.render()}};window.addEventListener("DOMContentLoaded",()=>SC7.init());
-</script></body>
+</script><script>
+/* Speed Court dev8: keep the screen awake while training is active. */
+(() => {
+  let lock = null, active = false;
+
+  const trainingVisible = () =>
+    !!document.querySelector('#endTrainingBtn, #stopTrainingBtn, [data-action="end-training"], #trainingScreen, #trainingView, .training-screen');
+
+  async function acquire() {
+    if (!active || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+    try {
+      if (lock && lock.released === false) return;
+      lock = await navigator.wakeLock.request('screen');
+      lock.addEventListener?.('release', () => {
+        lock = null;
+        if (active && document.visibilityState === 'visible') setTimeout(acquire, 250);
+      });
+    } catch (_) { lock = null; }
+  }
+
+  async function release() {
+    try { if (lock) await lock.release(); } catch (_) {}
+    lock = null;
+  }
+
+  function sync() {
+    const now = trainingVisible();
+    if (now && !active) { active = true; acquire(); }
+    if (!now && active) { active = false; release(); }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      sync();
+      if (active) acquire();
+    }
+  });
+  window.addEventListener('focus', () => { sync(); if (active) acquire(); });
+  new MutationObserver(sync).observe(document.documentElement, {childList:true, subtree:true, attributes:true});
+  document.addEventListener('DOMContentLoaded', sync);
+  setInterval(sync, 1000);
+
+  window.SpeedCourtWakeLock = {
+    start: () => { active = true; acquire(); },
+    stop: () => { active = false; release(); },
+    supported: () => 'wakeLock' in navigator
+  };
+})();
+</script>
+</body>
 </html>
