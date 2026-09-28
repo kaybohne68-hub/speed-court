@@ -353,3 +353,9 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Versionsunabhängige Spielerdatenbank in `speedcourt.players.v1`.
 - JSON-Export und JSON-Import für Versionswechsel/Backup.
 - Import kann vorhandene Daten ersetzen oder ergänzen.
+
+## dev11
+- dev10 speechSynthesis override removed because it could interfere with training startup.
+- Existing training/start logic left untouched.
+- English 21-file audio pack retained as a passive library.
+- Service-worker cache bumped to dev11.
