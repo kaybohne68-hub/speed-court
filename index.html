@@ -153,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev12</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev13</div>
     </header>
 
     <section id="setup" class="card">
@@ -334,6 +334,8 @@
       </div>
       <p id="resBreakdown" class="tiny"></p>
       <button id="againBtn" class="primary">Noch einmal</button>
+      <button id="changePlayerBtn" class="secondary" style="margin-top:10px">👥 Anderen Spieler auswählen</button>
+      <button id="exitTrainingBtn" class="secondary" style="margin-top:10px;border-color:#ef4444;color:#ef4444">⌂ Training beenden</button>
     </section>
   </main>
 
@@ -1066,15 +1068,26 @@ $("startBtn").onclick=startTraining;
 $("stopBtn").onclick=finishTraining;
 $("againBtn").onclick=()=>{
   $("results").classList.add("hidden");
+$("changePlayerBtn").onclick=()=>{
+  showScreen("setup");
+  $("playerSelect").value="";
+  selectedPlayerId=null;
+  $("playerActions").classList.add("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+$("exitTrainingBtn").onclick=()=>{
+  showScreen("setup");
+  window.scrollTo({top:0,behavior:"smooth"});
+};
   $("setup").classList.remove("hidden");
 };
 
 
-/* Speed Court 2.0.0-dev12: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev13: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
- "Los!":"audio/en/go.mp3","Step":"audio/en/step.mp3","MITTE!":"audio/en/center.mp3",
+ "Los!":"audio/en/go.mp3","Step":"audio/en/step.mp3","MITTE!":"audio/en/center.mp3","Training beendet":"audio/en/training-complete.mp3",
  "Vorne links":"audio/en/front-left.mp3","Vorne rechts":"audio/en/front-right.mp3",
  "Mitte links":"audio/en/middle-left.mp3","Mitte rechts":"audio/en/middle-right.mp3",
  "Hinten links":"audio/en/back-left.mp3","Hinten mitte":"audio/en/back-center.mp3","Hinten rechts":"audio/en/back-right.mp3"
@@ -1108,7 +1121,10 @@ function sc12ApplyLanguage(){
     ['label[for="mode"]',"Modus","Mode"],['label[for="duration"]',"Trainingsdauer","Training duration"],
     ['label[for="rounds"]',"Runden","Rounds"],['label[for="countdown"]',"Start-Countdown","Start countdown"],
     ['label[for="rest"]',"Rundenpause","Round rest"],['label[for="signal"]',"Signal","Signal"],
-    ["#startBtn","Training starten","Start training"],["#historyBtn","📊 Verlauf","📊 History"],
+    ["#startBtn","Training starten","Start training"],
+    ["#againBtn","Noch einmal","Train again"],
+    ["#changePlayerBtn","👥 Anderen Spieler auswählen","👥 Choose another player"],
+    ["#exitTrainingBtn","⌂ Training beenden","⌂ Exit training"],["#historyBtn","📊 Verlauf","📊 History"],
     ["#deletePlayerBtn","Spieler löschen","Delete player"],["#newPlayerBtn","+ Neu","+ New"],
     ["#exportPlayersBtn","💾 Spielerdaten exportieren","💾 Export player data"],
     ["#importPlayersBtn","📂 Spielerdaten importieren","📂 Import player data"]
