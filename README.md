@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev13
+# Speed Court 2.0.0-dev14
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -16,3 +16,7 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 ## dev13
 - Abschluss: Noch einmal / Anderen Spieler auswählen / Training beenden.
 - Englische Abschlussansage: audio/en/training-complete.mp3.
+
+## dev14
+- Fehler aus dev13 behoben: Spielerwechsel- und Beenden-Handler waren versehentlich im 'Noch einmal'-Handler verschachtelt.
+- Alle drei Abschlussbuttons besitzen jetzt unabhängige Click-Handler.
