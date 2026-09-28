@@ -153,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev8</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev9</div>
     </header>
 
     <section id="setup" class="card">
@@ -170,6 +170,11 @@
         <div id="playerActions" class="row hidden" style="margin-top:10px">
           <button id="historyBtn" class="secondary" style="width:auto;padding:10px 12px">📊 Verlauf</button>
           <button id="deletePlayerBtn" class="secondary" style="width:auto;padding:10px 12px">Spieler löschen</button>
+        </div>
+        <div class="row" style="margin-top:10px;flex-wrap:wrap">
+          <button id="exportPlayersBtn" class="secondary" style="width:auto;padding:10px 12px">💾 Spielerdaten exportieren</button>
+          <button id="importPlayersBtn" class="secondary" style="width:auto;padding:10px 12px">📂 Spielerdaten importieren</button>
+          <input id="importPlayersFile" type="file" accept="application/json,.json" class="hidden">
         </div>
       </div>
 
@@ -327,7 +332,7 @@ const SC7={d:{
 de:{appLanguage:"App-Sprache",voiceLanguage:"Trainingsansagen",devSwitch:"FREE / PRO Testschalter",auto:"Automatisch",de:"Deutsch",en:"English",start:"Training starten",setup:"Training einstellen",history:"Verlauf",del:"Spieler löschen",add:"+ Neu",mode:"Modus",duration:"Trainingsdauer",rounds:"Runden",countdown:"Start-Countdown",rest:"Rundenpause",signal:"Signal",audio:"Bluetooth / Audio testen",status:"Aktiver Entwicklungsstatus: {x} · Noch keine echte Bezahlung.",four:"4-Ecken Footwork",five:"5-Punkte Footwork",footwork:"6-Ecken Footwork",seven:"7-Positionen Footwork",sprint:"Explosive Sprints",split:"Split-Step Reaktion",both:"Sprache + Bildschirm",voice:"Nur Sprache",screen:"Nur Bildschirm"},
 en:{appLanguage:"App language",voiceLanguage:"Training voice",devSwitch:"FREE / PRO test switch",auto:"Automatic",de:"German",en:"English",start:"Start training",setup:"Set up training",history:"History",del:"Delete player",add:"+ New",mode:"Mode",duration:"Training duration",rounds:"Rounds",countdown:"Start countdown",rest:"Round rest",signal:"Signal",audio:"Test Bluetooth / Audio",status:"Active developer status: {x} · No real payment yet.",four:"4-Corner Footwork",five:"5-Point Footwork",footwork:"6-Corner Footwork",seven:"7-Position Footwork",sprint:"Explosive Sprints",split:"Split-Step Reaction",both:"Voice + screen",voice:"Voice only",screen:"Screen only"}},
 lang(){let v=document.getElementById("sc7Ui")?.value||localStorage.getItem("sc7.ui")||"auto";return v==="auto"?((navigator.language||"de").toLowerCase().startsWith("de")?"de":"en"):v},t(k){return this.d[this.lang()][k]||k},
-render(){document.querySelectorAll("#sc7Settings [data-k]").forEach(e=>e.textContent=this.t(e.dataset.k));let set=(id,k)=>{let e=document.getElementById(id);if(e)e.textContent=this.t(k)};set("startBtn","start");set("historyBtn","history");set("deletePlayerBtn","del");set("addPlayerBtn","add");set("audioTestBtn","audio");for(const [id,k] of Object.entries({mode:"mode",duration:"duration",rounds:"rounds",countdown:"countdown",rest:"rest",signal:"signal"})){let e=document.querySelector('label[for="'+id+'"]');if(e)e.textContent=this.t(k)}let m=document.getElementById("mode");if(m)[...m.options].forEach(o=>{if(this.d.de[o.value])o.textContent=this.t(o.value)});let s=document.getElementById("signal");if(s)[...s.options].forEach(o=>{if(["both","voice","screen"].includes(o.value))o.textContent=this.t(o.value)});let x=document.getElementById("sc7Pro")?.value||"FREE";document.getElementById("sc7Status").textContent=this.t("status").replace("{x}",x);document.querySelectorAll("h2").forEach(e=>{if(/Training einstellen|Set up training/.test(e.textContent))e.textContent=this.t("setup")});document.documentElement.lang=this.lang()},
+render(){document.querySelectorAll("#sc7Settings [data-k]").forEach(e=>e.textContent=this.t(e.dataset.k));let set=(id,k)=>{let e=document.getElementById(id);if(e)e.textContent=this.t(k)};set("startBtn","start");set("historyBtn","history");set("deletePlayerBtn","del");set("newPlayerBtn","add");set("audioTestBtn","audio");for(const [id,k] of Object.entries({mode:"mode",duration:"duration",rounds:"rounds",countdown:"countdown",rest:"rest",signal:"signal"})){let e=document.querySelector('label[for="'+id+'"]');if(e)e.textContent=this.t(k)}let m=document.getElementById("mode");if(m)[...m.options].forEach(o=>{if(this.d.de[o.value])o.textContent=this.t(o.value)});let s=document.getElementById("signal");if(s)[...s.options].forEach(o=>{if(["both","voice","screen"].includes(o.value))o.textContent=this.t(o.value)});let x=document.getElementById("sc7Pro")?.value||"FREE";document.getElementById("sc7Status").textContent=this.t("status").replace("{x}",x);document.querySelectorAll("h2").forEach(e=>{if(/Training einstellen|Set up training/.test(e.textContent))e.textContent=this.t("setup")});document.documentElement.lang=this.lang()},
 init(){let u=document.getElementById("sc7Ui"),v=document.getElementById("sc7Voice"),p=document.getElementById("sc7Pro");u.value=localStorage.getItem("sc7.ui")||"auto";v.value=localStorage.getItem("sc7.voice")||"de";p.value=localStorage.getItem("sc7.pro")||"FREE";u.onchange=()=>{localStorage.setItem("sc7.ui",u.value);this.render()};v.onchange=()=>localStorage.setItem("sc7.voice",v.value);p.onchange=()=>{localStorage.setItem("sc7.pro",p.value);this.render()};this.render()}};window.addEventListener("DOMContentLoaded",()=>SC7.init());
 </script><script>
 /* Speed Court dev8: keep the screen awake while training is active. */
@@ -377,6 +382,22 @@ init(){let u=document.getElementById("sc7Ui"),v=document.getElementById("sc7Voic
     supported: () => 'wakeLock' in navigator
   };
 })();
+</script>
+<script>
+/* dev9: version-independent player database + backup/restore */
+const SpeedCourtPlayers={
+ key:"speedcourt.players.v1", selectedKey:"speedcourt.selectedPlayer.v1",
+ load(){try{const x=JSON.parse(localStorage.getItem(this.key)||"[]");return Array.isArray(x)?x:[]}catch(_){return[]}},
+ save(x){localStorage.setItem(this.key,JSON.stringify(x))},
+ migrate(){if(this.load().length)return;for(const k of ["players","speedCourtPlayers","speedcourt.players","sc.players"]){try{const x=JSON.parse(localStorage.getItem(k)||"null");if(Array.isArray(x)&&x.length){this.save(x.map((v,i)=>typeof v==="string"?{id:"legacy-"+i+"-"+Date.now(),name:v,createdAt:new Date().toISOString(),history:[]}:{...v,id:v.id||("legacy-"+i+"-"+Date.now()),history:Array.isArray(v.history)?v.history:[]}));break}}catch(_){}}},
+ render(){const sel=document.getElementById("playerSelect"),info=document.getElementById("playerInfo"),actions=document.getElementById("playerActions");if(!sel)return;const old=localStorage.getItem(this.selectedKey)||sel.value;const ps=this.load();sel.innerHTML='<option value="">Spieler/in auswählen …</option>';for(const p of ps){const o=document.createElement("option");o.value=p.id;o.textContent=p.name;sel.appendChild(o)}if(ps.some(p=>p.id===old))sel.value=old;else localStorage.removeItem(this.selectedKey);const p=ps.find(p=>p.id===sel.value);if(p){info.textContent='Ausgewählt: '+p.name+(p.history?.length?' · '+p.history.length+' Training(s)':'');actions.classList.remove('hidden')}else{info.textContent=ps.length?'Bitte Spieler/in auswählen.':'Noch kein Profil angelegt.';actions.classList.add('hidden')}},
+ add(){const name=prompt("Name des Spielers / der Spielerin:")?.trim();if(!name)return;const ps=this.load();const p={id:(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)),name,createdAt:new Date().toISOString(),history:[]};ps.push(p);this.save(ps);localStorage.setItem(this.selectedKey,p.id);this.render()},
+ remove(){const id=document.getElementById("playerSelect")?.value;if(!id)return;const ps=this.load(),p=ps.find(x=>x.id===id);if(!p)return;if(!confirm('Spieler/in „'+p.name+'“ wirklich löschen?'))return;this.save(ps.filter(x=>x.id!==id));localStorage.removeItem(this.selectedKey);this.render()},
+ export(){const payload={format:"speed-court-player-database",schema:1,exportedAt:new Date().toISOString(),players:this.load()};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="speed-court-spielerdaten-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)},
+ async import(file){if(!file)return;try{const data=JSON.parse(await file.text()),incoming=Array.isArray(data)?data:data.players;if(!Array.isArray(incoming))throw Error();const clean=incoming.filter(x=>x&&typeof x.name==="string").map((x,i)=>({...x,id:x.id||("import-"+Date.now()+"-"+i),history:Array.isArray(x.history)?x.history:[]}));if(!clean.length)throw Error();const replace=confirm("OK = vorhandene Spielerdaten ersetzen.\nAbbrechen = importierte Spieler ergänzen.");if(replace)this.save(clean);else{const cur=this.load(),ids=new Set(cur.map(x=>x.id));for(const x of clean){if(ids.has(x.id))x.id=x.id+"-import-"+Date.now();cur.push(x)}this.save(cur)}this.render();alert(clean.length+" Spielerprofil(e) importiert.")}catch(_){alert("Die Datei ist keine gültige Speed-Court-Spielerdatenbank.")}},
+ init(){this.migrate();this.render();const q=id=>document.getElementById(id);q("newPlayerBtn")?.addEventListener("click",()=>this.add());q("deletePlayerBtn")?.addEventListener("click",()=>this.remove());q("playerSelect")?.addEventListener("change",e=>{if(e.target.value)localStorage.setItem(this.selectedKey,e.target.value);else localStorage.removeItem(this.selectedKey);this.render()});q("exportPlayersBtn")?.addEventListener("click",()=>this.export());q("importPlayersBtn")?.addEventListener("click",()=>q("importPlayersFile")?.click());q("importPlayersFile")?.addEventListener("change",e=>{this.import(e.target.files?.[0]);e.target.value=""})}
+};
+window.addEventListener("DOMContentLoaded",()=>SpeedCourtPlayers.init());
 </script>
 </body>
 </html>

@@ -346,3 +346,10 @@ Hinweis: Die gesprochenen Wörter verwenden in V1.6 weiterhin die Systemstimme. 
 - Screen Wake Lock während des aktiven Trainings.
 - Nach dem Aufwecken wird der Wake Lock erneut angefordert.
 - Neuer Service-Worker-Cache für dev8.
+
+
+## dev9
+- Spielerverwaltung wiederhergestellt: anlegen, auswählen, löschen.
+- Versionsunabhängige Spielerdatenbank in `speedcourt.players.v1`.
+- JSON-Export und JSON-Import für Versionswechsel/Backup.
+- Import kann vorhandene Daten ersetzen oder ergänzen.
