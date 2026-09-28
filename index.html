@@ -153,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev9</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev10</div>
     </header>
 
     <section id="setup" class="card">
@@ -398,6 +398,22 @@ const SpeedCourtPlayers={
  init(){this.migrate();this.render();const q=id=>document.getElementById(id);q("newPlayerBtn")?.addEventListener("click",()=>this.add());q("deletePlayerBtn")?.addEventListener("click",()=>this.remove());q("playerSelect")?.addEventListener("change",e=>{if(e.target.value)localStorage.setItem(this.selectedKey,e.target.value);else localStorage.removeItem(this.selectedKey);this.render()});q("exportPlayersBtn")?.addEventListener("click",()=>this.export());q("importPlayersBtn")?.addEventListener("click",()=>q("importPlayersFile")?.click());q("importPlayersFile")?.addEventListener("change",e=>{this.import(e.target.files?.[0]);e.target.value=""})}
 };
 window.addEventListener("DOMContentLoaded",()=>SpeedCourtPlayers.init());
+</script>
+<script>
+/* dev10 English audio pack */
+(()=>{const M={
+"1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3","6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
+"go":"audio/en/go.mp3","los":"audio/en/go.mp3","pause":"audio/en/pause.mp3","step":"audio/en/step.mp3","center":"audio/en/center.mp3","mitte":"audio/en/center.mp3",
+"front left":"audio/en/front-left.mp3","vorne links":"audio/en/front-left.mp3","front right":"audio/en/front-right.mp3","vorne rechts":"audio/en/front-right.mp3",
+"middle left":"audio/en/middle-left.mp3","mitte links":"audio/en/middle-left.mp3","middle right":"audio/en/middle-right.mp3","mitte rechts":"audio/en/middle-right.mp3",
+"back left":"audio/en/back-left.mp3","hinten links":"audio/en/back-left.mp3","back center":"audio/en/back-center.mp3","hinten mitte":"audio/en/back-center.mp3","back right":"audio/en/back-right.mp3","hinten rechts":"audio/en/back-right.mp3"};
+const n=x=>String(x||"").toLowerCase().replace(/[.!?,]/g,"").trim().replace(/\s+/g," ");
+const en=()=>{let e=document.querySelector("#sc7Voice,#sc2VoiceLanguage");return (e?.value||localStorage.getItem("sc7.voice")||localStorage.getItem("sc2.voiceLanguage")||"de")==="en"};
+const play=x=>{let f=M[n(x)];if(!en()||!f)return false;let a=new Audio(f);a.play().catch(()=>{});return true};
+if(window.speechSynthesis){let old=window.speechSynthesis.speak.bind(window.speechSynthesis);window.speechSynthesis.speak=u=>{if(!play(u?.text))old(u)}}
+window.SpeedCourtEnglishAudio={play,map:M};
+window.addEventListener("pointerdown",()=>{[...new Set(Object.values(M))].forEach(f=>{let a=new Audio(f);a.preload="auto"})},{once:true});
+})();
 </script>
 </body>
 </html>
