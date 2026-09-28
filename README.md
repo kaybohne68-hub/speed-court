@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev14
+# Speed Court 2.0.0-dev15
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -20,3 +20,9 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 ## dev14
 - Fehler aus dev13 behoben: Spielerwechsel- und Beenden-Handler waren versehentlich im 'Noch einmal'-Handler verschachtelt.
 - Alle drei Abschlussbuttons besitzen jetzt unabhängige Click-Handler.
+
+## dev15
+- Englische Ansagen für die mittleren Positionen korrigiert:
+  `Links` -> `audio/en/middle-left.mp3`, `Rechts` -> `audio/en/middle-right.mp3`.
+- Englische Abschlussansage korrigiert: `Training beendet.` -> `audio/en/training-complete.mp3`.
+- Cache auf dev15 erhöht.
