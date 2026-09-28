@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev15
+# Speed Court 2.0.0-dev16
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -26,3 +26,9 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
   `Links` -> `audio/en/middle-left.mp3`, `Rechts` -> `audio/en/middle-right.mp3`.
 - Englische Abschlussansage korrigiert: `Training beendet.` -> `audio/en/training-complete.mp3`.
 - Cache auf dev15 erhöht.
+
+## dev16
+- Englische Pausenansage korrigiert.
+- `Pause`, `Pause!` und `Pause.` werden bei englischen Trainingsansagen auf `audio/en/pause.mp3` abgebildet.
+- Trainingsablauf und Timing unverändert.
+- Cache auf dev16 erhöht.
