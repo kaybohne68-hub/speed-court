@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev18
+# Speed Court 2.0.0-dev19
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -42,3 +42,11 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Deutsche Eins und Pause direkt in index.html eingebettet; keine separaten Dateipfade mehr nötig.
 - Dadurch funktionieren beide Ansagen unabhängig vom GitHub-Upload des audio/de-Ordners.
 - Trainingslogik und Timing unverändert; Cache dev18.
+
+## dev19
+- Flexibles Rundenende: Nach Ablauf der Sollzeit wird die laufende Bewegungssequenz noch bis Mitte -> Step abgeschlossen; erst danach endet die Runde.
+- Es soll nach Ablauf der Sollzeit keine Sequenz mitten im Lauf abgebrochen werden.
+- Laufpunkte weiter an die Außenränder des Feldes gesetzt, mit 5 % Sicherheitsabstand.
+- Mittelpunkt bleibt zentral; Hinten Mitte liegt weiter unten am Rand.
+- Bestehende deutsche/englische Audioanpassungen aus dev18 bleiben erhalten.
+- Cache auf dev19 erhöht.
