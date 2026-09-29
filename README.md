@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev17
+# Speed Court 2.0.0-dev18
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -37,3 +37,8 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Bestätigte deutsche Pause als audio/de/pause.mp3 eingebaut.
 - Korrigierte deutsche Eins als audio/de/1.mp3 eingebaut.
 - Trainingslogik/Timing unverändert; Cache auf dev17 erhöht.
+
+## dev18
+- Deutsche Eins und Pause direkt in index.html eingebettet; keine separaten Dateipfade mehr nötig.
+- Dadurch funktionieren beide Ansagen unabhängig vom GitHub-Upload des audio/de-Ordners.
+- Trainingslogik und Timing unverändert; Cache dev18.
