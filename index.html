@@ -153,7 +153,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev16</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev17</div>
     </header>
 
     <section id="setup" class="card">
@@ -1087,7 +1087,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev16: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev17: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1183,6 +1183,23 @@ if(sc12Voice){sc12Voice.value=localStorage.getItem("sc12.voice")||"de";sc12Voice
 if(sc12Pro){sc12Pro.value=localStorage.getItem("sc12.pro")||"FREE";sc12Pro.onchange=()=>{localStorage.setItem("sc12.pro",sc12Pro.value);sc12ApplyLanguage();};}
 sc12ApplyLanguage();
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible" && state.running)sc12WakeStart();});
+
+
+/* dev17 corrected German voice files */
+const SC17_PREV_SPEAK=speak;
+speak=function(text,force=false){
+  if(typeof sc12VoiceLang==="function" && sc12VoiceLang()==="de"){
+    const m={"Pause":"audio/de/pause.mp3","Pause!":"audio/de/pause.mp3","Pause.":"audio/de/pause.mp3",
+             "1":"audio/de/1.mp3",1:"audio/de/1.mp3"};
+    const src=m[text];
+    if(src){
+      if(!force && $("signal").value!=="voice") return;
+      try{voiceAudio.pause();voiceAudio.currentTime=0;voiceAudio.src=src;voiceAudio.volume=1;voiceAudio.play().catch(()=>{});}catch(e){}
+      return;
+    }
+  }
+  return SC17_PREV_SPEAK(text,force);
+};
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
