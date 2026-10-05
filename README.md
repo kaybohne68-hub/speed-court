@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev19
+# Speed Court 2.0.0-dev20
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -50,3 +50,8 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Mittelpunkt bleibt zentral; Hinten Mitte liegt weiter unten am Rand.
 - Bestehende deutsche/englische Audioanpassungen aus dev18 bleiben erhalten.
 - Cache auf dev19 erhöht.
+
+## dev20
+- Punktpositionen an den tatsächlich gerenderten Elementen auf 7/93 % verschoben.
+- Rundenende wird während Ziel/Mitte nur vorgemerkt und direkt nach Step ausgeführt.
+- Cache dev20.
