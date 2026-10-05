@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev20
+# Speed Court 2.0.0-dev21
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -55,3 +55,8 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Punktpositionen an den tatsächlich gerenderten Elementen auf 7/93 % verschoben.
 - Rundenende wird während Ziel/Mitte nur vorgemerkt und direkt nach Step ausgeführt.
 - Cache dev20.
+
+## dev21
+- Laufpunkte direkt in den tatsächlich verwendeten CSS-Klassen vl/vr/ml/mr/hl/hm/hr weiter nach außen gesetzt.
+- Flexibles Rundenende aus dev20 unverändert beibehalten.
+- Cache dev21.
