@@ -154,7 +154,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev22</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev23</div>
     </header>
 
     <section id="setup" class="card">
@@ -586,7 +586,8 @@ function cue(){
     beep();
     vibrate(50);
     setTimeout(()=>{
-      if (!state.running || Date.now() >= state.endTs) return;
+      if (!state.running) return;
+      if (Date.now() >= state.endTs) return finishRound();
       doDirection();
     }, 150 + Math.random()*250);
   } else {
@@ -636,14 +637,14 @@ function doDirection(){
   const centerMs = $("mode").value === "sprint" ? Math.max(toCenterMs, 750) : toCenterMs;
 
   state.cueTimeout = setTimeout(()=>{
-    if (!state.running || Date.now() >= state.endTs) return;
+    if (!state.running) return;
     speak("BUM!", true);
     $("phase").textContent = "Position erreicht";
     clearActive();
     vibrate(35);
 
     state.centerTimeout = setTimeout(()=>{
-      if (!state.running || Date.now() >= state.endTs) return;
+      if (!state.running) return;
       speak("MITTE!", true);
       $("phase").textContent = "Zentrum";
       $("direction").textContent = "BEREIT";
@@ -658,20 +659,21 @@ function doDirection(){
       const reactionPause = lo + Math.random() * (hi - lo);
 
       state.nextTimeout = setTimeout(()=>{
-        if (!state.running || Date.now() >= state.endTs) return;
+        if (!state.running) return;
 
         state.nextTimeout = setTimeout(()=>{
-          if (!state.running || Date.now() >= state.endTs) return;
+          if (!state.running) return;
           speak("Step", true);
           $("phase").textContent = "STEP";
           $("direction").textContent = "STEP";
           vibrate(45);
 
           state.nextTimeout = setTimeout(()=>{
-            if (!state.running || Date.now() >= state.endTs) return;
+            if (!state.running) return;
             $("phase").textContent = "Training";
+            if (Date.now() >= state.endTs) return finishRound();
             cue();
-          }, reactionPause);
+          }, (Date.now() >= state.endTs ? 60 : reactionPause));
         }, stepDelayMs);
       }, centerSoundMs);
     }, centerMs);
@@ -1088,7 +1090,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev22: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev23: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1231,107 +1233,6 @@ window.addEventListener("load",()=>{sc20Edges();setTimeout(sc20Edges,100);setTim
 new MutationObserver(sc20Edges).observe(document.body,{childList:true,subtree:true});
 
 
-
-/* dev22: robust round-end state machine + sequence watchdog */
-state.sc22Phase = "idle";
-state.sc22FinishRequested = false;
-state.sc22Watchdog = null;
-
-const SC22_ORIGINAL_SPEAK = speak;
-const SC22_ORIGINAL_FINISH = finishRound;
-
-function sc22ClearWatchdog(){
-  if(state.sc22Watchdog){
-    clearTimeout(state.sc22Watchdog);
-    state.sc22Watchdog = null;
-  }
-}
-
-function sc22FinishNow(){
-  sc22ClearWatchdog();
-  state.sc22FinishRequested = false;
-  state.sc22Phase = "idle";
-  return SC22_ORIGINAL_FINISH();
-}
-
-function sc22ArmWatchdog(){
-  sc22ClearWatchdog();
-  /* The configured max pause + center->step delay normally finishes far sooner.
-     8 s is only an emergency recovery path. */
-  state.sc22Watchdog = setTimeout(()=>{
-    if(!state.running) return;
-    if(state.sc22Phase === "target"){
-      state.sc22Phase = "center";
-      try { SC22_ORIGINAL_SPEAK("MITTE!", true); } catch(e) {}
-      setTimeout(()=>{
-        if(!state.running) return;
-        state.sc22Phase = "step";
-        try { SC22_ORIGINAL_SPEAK("Step", true); } catch(e) {}
-        if(state.sc22FinishRequested) sc22FinishNow();
-        else state.sc22Phase = "idle";
-      }, Math.max(250, Number(document.getElementById("stepDelay")?.value || 0.5) * 1000));
-    } else if(state.sc22FinishRequested && state.sc22Phase !== "idle"){
-      sc22FinishNow();
-    }
-  }, 8000);
-}
-
-speak = function(text, force=false){
-  const clean = String(text).replace(/[.!]/g,"").trim();
-  const targets = [
-    "Vorne links","Vorne rechts","Links","Rechts","Mitte links","Mitte rechts",
-    "Hinten links","Hinten mitte","Hinten rechts",
-    "Front left","Front right","Left","Right","Middle left","Middle right",
-    "Back left","Back center","Back right"
-  ];
-
-  if(targets.includes(clean)){
-    state.sc22Phase = "target";
-    sc22ArmWatchdog();
-  } else if(clean === "MITTE" || clean === "Mitte" || clean === "CENTER" || clean === "Center"){
-    state.sc22Phase = "center";
-    sc22ArmWatchdog();
-  }
-
-  const result = SC22_ORIGINAL_SPEAK(text, force);
-
-  if(clean === "Step"){
-    sc22ClearWatchdog();
-    state.sc22Phase = "step";
-    if(state.sc22FinishRequested){
-      setTimeout(sc22FinishNow, 60);
-    } else {
-      /* Return to idle only after Step has been issued. */
-      setTimeout(()=>{ if(state.sc22Phase === "step") state.sc22Phase = "idle"; }, 100);
-    }
-  }
-  return result;
-};
-
-finishRound = function(){
-  if(!state.running) return SC22_ORIGINAL_FINISH();
-
-  if(state.sc22Phase === "target" || state.sc22Phase === "center"){
-    state.sc22FinishRequested = true;
-    sc22ArmWatchdog();
-    return;
-  }
-
-  /* At Step or between sequences, finishing is safe. */
-  return sc22FinishNow();
-};
-
-window.addEventListener("pagehide", sc22ClearWatchdog);
-
-
-window.addEventListener("load",()=>{
-  const startBtn = document.getElementById("startBtn") || document.querySelector('[data-action="start"]');
-  if(startBtn) startBtn.addEventListener("click",()=>{
-    sc22ClearWatchdog();
-    state.sc22Phase="idle";
-    state.sc22FinishRequested=false;
-  }, true);
-});
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
