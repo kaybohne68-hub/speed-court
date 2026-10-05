@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev21
+# Speed Court 2.0.0-dev22
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -60,3 +60,11 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Laufpunkte direkt in den tatsächlich verwendeten CSS-Klassen vl/vr/ml/mr/hl/hm/hr weiter nach außen gesetzt.
 - Flexibles Rundenende aus dev20 unverändert beibehalten.
 - Cache dev21.
+
+## dev22
+- Deadlock-Fix für lange Trainings: Rundenende stoppt keine laufende Zielsequenz mehr.
+- Normales Rundenende weiterhin ausschließlich nach Position -> Mitte -> Step.
+- 8-Sekunden-Watchdog als Notfall: hängt eine Sequenz nach einer Position, wird sie kontrolliert über Mitte -> Step abgeschlossen.
+- Nach Step wird ein vorgemerktes Rundenende sicher ausgeführt.
+- Punktpositionen aus dev21 bleiben erhalten.
+- Cache auf dev22 erhöht.
