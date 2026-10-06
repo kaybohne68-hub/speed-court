@@ -154,7 +154,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev24</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev25</div>
     </header>
 
     <section id="setup" class="card">
@@ -315,8 +315,9 @@
       <div class="card">
         <div class="stats">
           <div class="stat"><b id="cueCount">0</b><span>Signale</span></div>
-          <div class="stat"><b id="elapsed">0s</b><span>aktive Zeit</span></div>
-          <div class="stat"><b id="currentRound">1</b><span>Runde</span></div>
+          <div class="stat"><b id="elapsed">0s</b><span id="elapsedLabel">aktive Zeit / Runde</span></div>
+          <div class="stat"><b id="currentRound">1 / 1</b><span>Runde</span></div>
+          <div class="stat"><b id="pauseTime">–</b><span id="pauseLabel">Pause</span></div>
         </div>
         <div style="height:12px"></div>
         <button id="stopBtn" class="danger">Training beenden</button>
@@ -770,7 +771,9 @@ function startRound(){
   state.endTs = state.roundStartTs + dur;
   $("phase").textContent = "Training";
   $("roundText").textContent = `Runde ${state.round} / ${$("rounds").value}`;
-  $("currentRound").textContent = state.round;
+  $("currentRound").textContent = `${state.round} / ${$("rounds").value}`;
+  $("elapsed").textContent = "0s";
+  $("pauseTime").textContent = "–";
   $("direction").textContent = "BEREIT";
   state.roundCues=0;
 
@@ -778,7 +781,7 @@ function startRound(){
   state.timerInterval=setInterval(()=>{
     const remain=Math.max(0, Math.ceil((state.endTs-Date.now())/1000));
     $("timer").textContent=remain;
-    $("elapsed").textContent=Math.floor((Date.now()-state.startTs)/1000)+"s";
+    $("elapsed").textContent=Math.floor((Date.now()-state.roundStartTs)/1000)+"s";
     if(remain<=0) finishRound();
   },200);
 
@@ -830,12 +833,15 @@ function finishRound(){
   let remain=parseInt($("rest").value,10);
   announcePause(remain);
   $("timer").textContent=remain;
+  $("pauseTime").textContent=remain+"s";
+  $("currentRound").textContent=`${state.round} / ${totalRounds}`;
   $("roundText").textContent=`Nächste Runde: ${state.round} / ${totalRounds}`;
 
   clearInterval(state.restInterval);
   state.restInterval=setInterval(()=>{
     remain--;
     $("timer").textContent=remain;
+    $("pauseTime").textContent=Math.max(0,remain)+"s";
     if(remain<=0){
       clearInterval(state.restInterval);
       announceReadyAndCountdown();
@@ -1095,7 +1101,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev24: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev25: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1239,6 +1245,15 @@ new MutationObserver(sc20Edges).observe(document.body,{childList:true,subtree:tr
 
 
 
+
+/* dev25: labels for per-round time and round break */
+function sc25StatLabels(){
+ const en=(document.getElementById("uiLanguage")?.value||"de")==="en";
+ const e=document.getElementById("elapsedLabel"), p=document.getElementById("pauseLabel");
+ if(e)e.textContent=en?"active time / round":"aktive Zeit / Runde";
+ if(p)p.textContent=en?"Break":"Pause";
+}
+window.addEventListener("load",()=>{sc25StatLabels();document.getElementById("uiLanguage")?.addEventListener("change",sc25StatLabels);});
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }

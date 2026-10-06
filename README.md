@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev24
+# Speed Court 2.0.0-dev25
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -61,15 +61,15 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Flexibles Rundenende aus dev20 unverändert beibehalten.
 - Cache dev21.
 
-## dev24
+## dev25
 - Deadlock-Fix für lange Trainings: Rundenende stoppt keine laufende Zielsequenz mehr.
 - Normales Rundenende weiterhin ausschließlich nach Position -> Mitte -> Step.
 - 8-Sekunden-Watchdog als Notfall: hängt eine Sequenz nach einer Position, wird sie kontrolliert über Mitte -> Step abgeschlossen.
 - Nach Step wird ein vorgemerktes Rundenende sicher ausgeführt.
 - Punktpositionen aus dev21 bleiben erhalten.
-- Cache auf dev24 erhöht.
+- Cache auf dev25 erhöht.
 
-## dev24 – Sequenz-Fix
+## dev25 – Sequenz-Fix
 - Nach Start einer Zielbewegung keine Rundendauer-Abbruchprüfung mehr innerhalb der Sequenz.
 - Jede gestartete Bewegung läuft vollständig: Ziel -> BUM -> MITTE -> Step.
 - Zeitprüfung nur vor einer neuen Bewegung und direkt nach Step.
@@ -77,6 +77,12 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Der bisherige Watchdog wurde entfernt; der eigentliche Ablauf ist korrigiert.
 - Außenpositionen aus dev21 bleiben erhalten.
 
-## dev24
+## dev25
 - Rundenanzahl von 1 bis 10 auswählbar.
 - Sequenz-Fix aus dev23 beibehalten.
+
+## dev25
+- Aktive Zeit wird für jede Runde separat ab 0 s angezeigt.
+- In der Rundenpause bleibt die aktive Rundenzeit stehen.
+- Separate Pause-Anzeige zählt die Pausenzeit herunter.
+- Rundenanzeige zeigt aktuelle Runde / Gesamtzahl.
