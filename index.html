@@ -117,9 +117,17 @@
       transform:translate(-50%,-50%) scale(1.18);
       box-shadow:0 0 32px rgba(255,255,255,.75)
     }
-    .vl{left:12%;top:12%}.vr{left:88%;top:12%}
+    .nvl{left:28%;top:4%}.nvr{left:72%;top:4%}\n    .vl{left:12%;top:12%}.vr{left:88%;top:12%}
     .ml{left:10%;top:47%}.mr{left:90%;top:47%}
     .hl{left:12%;bottom:7%}.hm{left:50%;bottom:7%}.hr{left:88%;bottom:7%}
+
+    .mode-preview{margin:10px 0 4px;padding:10px;border:1px solid var(--line);border-radius:14px;background:#0b1424}
+    .mode-preview-title{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:7px}
+    .mini-court{position:relative;width:150px;height:105px;margin:auto;background:#126747;border:3px solid #e5e7eb;border-radius:5px;overflow:hidden}
+    .mini-court:before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px solid #e5e7eb}
+    .mini-court:after{content:"";position:absolute;left:0;right:0;top:28%;border-top:1px solid #e5e7eb}
+    .mini-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:#64748b;border:1px solid white;transform:translate(-50%,-50%);opacity:.25}
+    .mini-dot.on{background:#fbbf24;opacity:1;box-shadow:0 0 8px #fbbf24}
     .player{
       position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
       width:34px;height:34px;border-radius:50%;background:#fbbf24;
@@ -154,7 +162,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev25</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev26</div>
     </header>
 
     <section id="setup" class="card">
@@ -181,13 +189,29 @@
 
       <label for="mode">Modus</label>
       <select id="mode">
-        <option value="footwork">6-Ecken Footwork</option>
-        <option value="four">4-Ecken Footwork</option>
+        <option value="footwork">6-Punkte Footwork</option>
+        <option value="four">4-Punkte Footwork</option>
         <option value="five">5-Punkte Footwork</option>
-        <option value="seven">7-Positionen Footwork</option>
+        <option value="seven">7-Punkte Footwork</option>
+        <option value="eight">8-Punkte Footwork</option>
         <option value="sprint">Explosive Sprints</option>
         <option value="split">Split-Step Reaktion</option>
       </select>
+      <div class="mode-preview">
+        <div id="modePreviewTitle" class="mode-preview-title">Laufpunkte dieses Modus</div>
+        <div class="mini-court" aria-hidden="true">
+          <i class="mini-dot" data-mini="nvl" style="left:28%;top:4%"></i>
+          <i class="mini-dot" data-mini="nvr" style="left:72%;top:4%"></i>
+          <i class="mini-dot" data-mini="vl" style="left:12%;top:12%"></i>
+          <i class="mini-dot" data-mini="vr" style="left:88%;top:12%"></i>
+          <i class="mini-dot" data-mini="ml" style="left:10%;top:47%"></i>
+          <i class="mini-dot" data-mini="mr" style="left:90%;top:47%"></i>
+          <i class="mini-dot" data-mini="hl" style="left:12%;top:90%"></i>
+          <i class="mini-dot" data-mini="hm" style="left:50%;top:90%"></i>
+          <i class="mini-dot" data-mini="hr" style="left:88%;top:90%"></i>
+        </div>
+      </div>
+
 
       <div class="grid2">
         <div>
@@ -301,8 +325,8 @@
           <div class="center-line"></div>
           <div class="service1"></div>
           <div class="service2"></div>
-          <div class="target vl" data-dir="vl">VORNE<br>LINKS</div>
-          <div class="target vr" data-dir="vr">VORNE<br>RECHTS</div>
+          <div class="target nvl" data-dir="nvl">VORN<br>LINKS</div>\n          <div class="target vl" data-dir="vl">VORNE<br>LINKS</div>
+          <div class="target nvr" data-dir="nvr">VORN<br>RECHTS</div>\n          <div class="target vr" data-dir="vr">VORNE<br>RECHTS</div>
           <div class="target ml" data-dir="ml">MITTE<br>LINKS</div>
           <div class="target mr" data-dir="mr">MITTE<br>RECHTS</div>
           <div class="target hl" data-dir="hl">HINTEN<br>LINKS</div>
@@ -348,6 +372,8 @@
 
 <script>
 const dirs = [
+  {id:"nvl", label:"Vorn links"},
+  {id:"nvr", label:"Vorn rechts"},
   {id:"vl", label:"Vorne links"},
   {id:"vr", label:"Vorne rechts"},
   {id:"ml", label:"Links"},
@@ -547,8 +573,10 @@ function updateModeTargets(){
     allowed = ["vl","vr","hl","hr"];
   }else if(mode === "five"){
     allowed = ["vl","vr","hl","hm","hr"];
-  }else if(mode === "seven"){
+   }else if(mode === "seven"){
     allowed = ["vl","vr","ml","mr","hl","hm","hr"];
+  }else if(mode === "eight"){
+    allowed = ["nvl","nvr","vl","vr","ml","mr","hl","hr"];
   }else{
     // 6-Ecken, Explosive Sprints und Split-Step: ursprüngliche sechs Positionen.
     allowed = ["vl","vr","ml","mr","hl","hr"];
@@ -556,6 +584,9 @@ function updateModeTargets(){
 
   document.querySelectorAll(".target[data-dir]").forEach(el=>{
     el.classList.toggle("mode-hidden", !allowed.includes(el.dataset.dir));
+  });
+  document.querySelectorAll(".mini-dot[data-mini]").forEach(el=>{
+    el.classList.toggle("on", allowed.includes(el.dataset.mini));
   });
 }
 
@@ -566,9 +597,11 @@ function chooseDirection(){
     pool = dirs.filter(d => ["vl","vr","hl","hr"].includes(d.id));
   } else if(mode === "five"){
     pool = dirs.filter(d => ["vl","vr","hl","hm","hr"].includes(d.id));
+   } else if(mode === "eight"){
+    pool = dirs.filter(d => ["nvl","nvr","vl","vr","ml","mr","hl","hr"].includes(d.id));
   } else if(mode !== "seven"){
-    // Existing 6-corner, sprint and split modes keep the original six positions.
-    pool = dirs.filter(d => d.id !== "hm");
+    // Existing 6-point, sprint and split modes keep the original six positions.
+    pool = dirs.filter(d => ["vl","vr","ml","mr","hl","hr"].includes(d.id));
   }
   return pool[Math.floor(Math.random()*pool.length)];
 }
@@ -1101,7 +1134,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev25: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev26: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1148,10 +1181,12 @@ function sc12ApplyLanguage(){
     ["#importPlayersBtn","📂 Spielerdaten importieren","📂 Import player data"]
   ];
   pairs.forEach(([sel,de,enText])=>{const e=document.querySelector(sel);if(e)e.textContent=en?enText:de;});
-  const modeNames={four:["4-Ecken Footwork","4-Corner Footwork"],five:["5-Punkte Footwork","5-Point Footwork"],
-    footwork:["6-Ecken Footwork","6-Corner Footwork"],seven:["7-Positionen Footwork","7-Position Footwork"],
+  const modeNames={four:["4-Punkte Footwork","4-Point Footwork"],five:["5-Punkte Footwork","5-Point Footwork"],
+    footwork:["6-Punkte Footwork","6-Point Footwork"],seven:["7-Punkte Footwork","7-Point Footwork"],
+    eight:["8-Punkte Footwork","8-Point Footwork"],
     sprint:["Explosive Sprints","Explosive Sprints"],split:["Split-Step Reaktion","Split-Step Reaction"]};
   [...$("mode").options].forEach(o=>{if(modeNames[o.value])o.textContent=modeNames[o.value][en?1:0];});
+  const mp=document.getElementById("modePreviewTitle"); if(mp)mp.textContent=en?"Running points in this mode":"Laufpunkte dieses Modus";
   const status=document.getElementById("sc12Status"), pro=document.getElementById("sc12Pro")?.value||"FREE";
   if(status)status.textContent=en?`Active developer status: ${pro} · No real payment yet.`:`Aktiver Entwicklungsstatus: ${pro} · Noch keine echte Bezahlung.`;
 }
@@ -1246,7 +1281,7 @@ new MutationObserver(sc20Edges).observe(document.body,{childList:true,subtree:tr
 
 
 
-/* dev25: labels for per-round time and round break */
+/* dev26: labels for per-round time and round break */
 function sc25StatLabels(){
  const en=(document.getElementById("uiLanguage")?.value||"de")==="en";
  const e=document.getElementById("elapsedLabel"), p=document.getElementById("pauseLabel");
