@@ -121,6 +121,33 @@
     .ml{left:10%;top:47%}.mr{left:90%;top:47%}
     .hl{left:12%;bottom:7%}.hm{left:50%;bottom:7%}.hr{left:88%;bottom:7%}
 
+
+    /* dev29: Badmintonfeld nach Referenzbild */
+    .court,.mini-court{
+      background:#08ad55 !important;
+      border-color:#eef2f7 !important;
+    }
+    .court::before,.mini-court::before{
+      content:"";position:absolute;z-index:1;pointer-events:none;
+      left:7%;right:7%;top:0;bottom:0;
+      border-left:4px solid #eef2f7;border-right:4px solid #eef2f7;
+      background:
+        linear-gradient(to bottom,
+          transparent 0, transparent 28%,
+          #eef2f7 28%, #eef2f7 calc(28% + 4px),
+          transparent calc(28% + 4px), transparent 84%,
+          #eef2f7 84%, #eef2f7 calc(84% + 4px),
+          transparent calc(84% + 4px));
+    }
+    .court::after,.mini-court::after{
+      content:"";position:absolute;z-index:1;pointer-events:none;
+      left:50%;top:28%;bottom:0;border-left:4px solid #eef2f7;
+    }
+    .net-line{position:absolute;z-index:3;left:0;right:0;top:1.5%;height:5px;background:#d90416;
+      box-shadow:0 1px 2px rgba(0,0,0,.35);pointer-events:none}
+    .court .target{z-index:4}
+    .mini-court .mini-dot{z-index:4}
+
     .mode-preview{margin:10px 0 4px;padding:10px;border:1px solid var(--line);border-radius:14px;background:#0b1424}
     .mode-preview-title{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:7px}
     .mini-court{position:relative;width:150px;height:105px;margin:auto;background:#126747;border:3px solid #e5e7eb;border-radius:5px;overflow:hidden}
@@ -162,7 +189,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev28</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev29</div>
     </header>
 
     <section id="setup" class="card">
@@ -189,17 +216,18 @@
 
       <label for="mode">Modus</label>
       <select id="mode">
-        <option value="footwork">6-Punkte Footwork</option>
+        <option value="two">2-Punkte Footwork</option>
         <option value="four">4-Punkte Footwork</option>
         <option value="five">5-Punkte Footwork</option>
+        <option value="footwork">6-Punkte Footwork</option>
         <option value="seven">7-Punkte Footwork</option>
-        <option value="two">2-Punkte Footwork</option>
         <option value="sprint">Explosive Sprints</option>
         <option value="split">Split-Step Reaktion</option>
       </select>
       <div class="mode-preview">
         <div id="modePreviewTitle" class="mode-preview-title">Laufpunkte dieses Modus</div>
         <div class="mini-court" aria-hidden="true">
+          <div class="net-line"></div>
           <i class="mini-dot" data-mini="nvl" style="left:10%;top:17%"></i>
           <i class="mini-dot" data-mini="nvr" style="left:90%;top:17%"></i>
           <i class="mini-dot" data-mini="vl" style="left:12%;top:12%"></i>
@@ -322,6 +350,7 @@
 
       <div class="card court-wrap">
         <div class="court">
+          <div class="net-line"></div>
           <div class="center-line"></div>
           <div class="service1"></div>
           <div class="service2"></div>
@@ -1134,7 +1163,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev28: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev29: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1281,7 +1310,7 @@ new MutationObserver(sc20Edges).observe(document.body,{childList:true,subtree:tr
 
 
 
-/* dev28: labels for per-round time and round break */
+/* dev29: labels for per-round time and round break */
 function sc25StatLabels(){
  const en=(document.getElementById("uiLanguage")?.value||"de")==="en";
  const e=document.getElementById("elapsedLabel"), p=document.getElementById("pauseLabel");
