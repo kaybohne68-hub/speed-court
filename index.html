@@ -117,7 +117,7 @@
       transform:translate(-50%,-50%) scale(1.18);
       box-shadow:0 0 32px rgba(255,255,255,.75)
     }
-    .nvl{left:28%;top:4%}.nvr{left:72%;top:4%}\n    .vl{left:12%;top:12%}.vr{left:88%;top:12%}
+    .nvl{left:28%;top:3%}.nvr{left:72%;top:3%}\n    .vl{left:12%;top:12%}.vr{left:88%;top:12%}
     .ml{left:10%;top:47%}.mr{left:90%;top:47%}
     .hl{left:12%;bottom:7%}.hm{left:50%;bottom:7%}.hr{left:88%;bottom:7%}
 
@@ -162,7 +162,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev26</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev27</div>
     </header>
 
     <section id="setup" class="card">
@@ -193,7 +193,7 @@
         <option value="four">4-Punkte Footwork</option>
         <option value="five">5-Punkte Footwork</option>
         <option value="seven">7-Punkte Footwork</option>
-        <option value="eight">8-Punkte Footwork</option>
+        <option value="two">2-Punkte Footwork</option>
         <option value="sprint">Explosive Sprints</option>
         <option value="split">Split-Step Reaktion</option>
       </select>
@@ -575,8 +575,8 @@ function updateModeTargets(){
     allowed = ["vl","vr","hl","hm","hr"];
    }else if(mode === "seven"){
     allowed = ["vl","vr","ml","mr","hl","hm","hr"];
-  }else if(mode === "eight"){
-    allowed = ["nvl","nvr","vl","vr","ml","mr","hl","hr"];
+   }else if(mode === "two"){
+    allowed = ["nvl","nvr"];
   }else{
     // 6-Ecken, Explosive Sprints und Split-Step: ursprüngliche sechs Positionen.
     allowed = ["vl","vr","ml","mr","hl","hr"];
@@ -597,8 +597,8 @@ function chooseDirection(){
     pool = dirs.filter(d => ["vl","vr","hl","hr"].includes(d.id));
   } else if(mode === "five"){
     pool = dirs.filter(d => ["vl","vr","hl","hm","hr"].includes(d.id));
-   } else if(mode === "eight"){
-    pool = dirs.filter(d => ["nvl","nvr","vl","vr","ml","mr","hl","hr"].includes(d.id));
+    } else if(mode === "two"){
+    pool = dirs.filter(d => ["nvl","nvr"].includes(d.id));
   } else if(mode !== "seven"){
     // Existing 6-point, sprint and split modes keep the original six positions.
     pool = dirs.filter(d => ["vl","vr","ml","mr","hl","hr"].includes(d.id));
@@ -1134,7 +1134,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev26: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev27: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1183,7 +1183,7 @@ function sc12ApplyLanguage(){
   pairs.forEach(([sel,de,enText])=>{const e=document.querySelector(sel);if(e)e.textContent=en?enText:de;});
   const modeNames={four:["4-Punkte Footwork","4-Point Footwork"],five:["5-Punkte Footwork","5-Point Footwork"],
     footwork:["6-Punkte Footwork","6-Point Footwork"],seven:["7-Punkte Footwork","7-Point Footwork"],
-    eight:["8-Punkte Footwork","8-Point Footwork"],
+    two:["2-Punkte Footwork","2-Point Footwork"],
     sprint:["Explosive Sprints","Explosive Sprints"],split:["Split-Step Reaktion","Split-Step Reaction"]};
   [...$("mode").options].forEach(o=>{if(modeNames[o.value])o.textContent=modeNames[o.value][en?1:0];});
   const mp=document.getElementById("modePreviewTitle"); if(mp)mp.textContent=en?"Running points in this mode":"Laufpunkte dieses Modus";
@@ -1281,7 +1281,7 @@ new MutationObserver(sc20Edges).observe(document.body,{childList:true,subtree:tr
 
 
 
-/* dev26: labels for per-round time and round break */
+/* dev27: labels for per-round time and round break */
 function sc25StatLabels(){
  const en=(document.getElementById("uiLanguage")?.value||"de")==="en";
  const e=document.getElementById("elapsedLabel"), p=document.getElementById("pauseLabel");

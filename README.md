@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev26
+# Speed Court 2.0.0-dev27
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -61,15 +61,15 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Flexibles Rundenende aus dev20 unverändert beibehalten.
 - Cache dev21.
 
-## dev26
+## dev27
 - Deadlock-Fix für lange Trainings: Rundenende stoppt keine laufende Zielsequenz mehr.
 - Normales Rundenende weiterhin ausschließlich nach Position -> Mitte -> Step.
 - 8-Sekunden-Watchdog als Notfall: hängt eine Sequenz nach einer Position, wird sie kontrolliert über Mitte -> Step abgeschlossen.
 - Nach Step wird ein vorgemerktes Rundenende sicher ausgeführt.
 - Punktpositionen aus dev21 bleiben erhalten.
-- Cache auf dev26 erhöht.
+- Cache auf dev27 erhöht.
 
-## dev26 – Sequenz-Fix
+## dev27 – Sequenz-Fix
 - Nach Start einer Zielbewegung keine Rundendauer-Abbruchprüfung mehr innerhalb der Sequenz.
 - Jede gestartete Bewegung läuft vollständig: Ziel -> BUM -> MITTE -> Step.
 - Zeitprüfung nur vor einer neuen Bewegung und direkt nach Step.
@@ -77,19 +77,26 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Der bisherige Watchdog wurde entfernt; der eigentliche Ablauf ist korrigiert.
 - Außenpositionen aus dev21 bleiben erhalten.
 
-## dev26
+## dev27
 - Rundenanzahl von 1 bis 10 auswählbar.
 - Sequenz-Fix aus dev23 beibehalten.
 
-## dev26
+## dev27
 - Aktive Zeit wird für jede Runde separat ab 0 s angezeigt.
 - In der Rundenpause bleibt die aktive Rundenzeit stehen.
 - Separate Pause-Anzeige zählt die Pausenzeit herunter.
 - Rundenanzeige zeigt aktuelle Runde / Gesamtzahl.
 
-## dev26
+## dev27
 - Modusnamen einheitlich auf Punkte umgestellt.
 - Kleine Feldvorschau unter der Moduswahl; aktive Laufpunkte leuchten.
 - Zwei neue vordere Punkte: Vorn links / Vorn rechts.
 - Neuer 8-Punkte-Footwork-Modus nutzt die zwei neuen vorderen Punkte plus die bisherigen sechs Standardpunkte.
 - Bestehende Trainingslogik aus dev25 beibehalten.
+
+## dev27
+- 8-Punkte-Footwork entfernt.
+- Neuer 2-Punkte-Footwork-Modus.
+- Dieser Modus verwendet ausschließlich zwei Punkte direkt vorn am Netz: Vorn links und Vorn rechts.
+- Kleine Modusvorschau zeigt im 2-Punkte-Modus nur diese beiden Netzpunkte.
+- Bestehende 4-, 5-, 6- und 7-Punkte-Modi bleiben erhalten.
