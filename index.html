@@ -122,7 +122,7 @@
     .hl{left:12%;bottom:7%}.hm{left:50%;bottom:7%}.hr{left:88%;bottom:7%}
 
 
-    /* dev29: Badmintonfeld nach Referenzbild */
+    /* dev30: Badmintonfeld nach Referenzbild */
     .court,.mini-court{
       background:#08ad55 !important;
       border-color:#eef2f7 !important;
@@ -182,6 +182,54 @@
       .grid2,.stats{grid-template-columns:1fr}
       .target{width:54px;height:54px;font-size:11px}
     }
+  
+    /* dev30: einheitliche, saubere Feldgeometrie */
+    .court{
+      aspect-ratio:610/670 !important;
+      overflow:hidden !important;
+      background:#08ad55 !important;
+      border:4px solid #eef2f7 !important;
+    }
+    .mini-court{
+      width:150px !important;
+      height:auto !important;
+      aspect-ratio:610/670 !important;
+      overflow:hidden !important;
+      background:#08ad55 !important;
+      border:3px solid #eef2f7 !important;
+    }
+    /* Einzel-Seitenlinien + vordere und hintere Aufschlaglinie */
+    .court::before,.mini-court::before{
+      content:"" !important;
+      position:absolute !important;z-index:1 !important;pointer-events:none !important;
+      left:7% !important;right:7% !important;top:0 !important;bottom:0 !important;
+      border-left:3px solid #eef2f7 !important;
+      border-right:3px solid #eef2f7 !important;
+      background:
+        linear-gradient(to bottom,
+          transparent 0,transparent 27.5%,
+          #eef2f7 27.5%,#eef2f7 28.1%,
+          transparent 28.1%,transparent 84%,
+          #eef2f7 84%,#eef2f7 84.6%,
+          transparent 84.6%) !important;
+    }
+    /* Mittellinie beginnt erst an der vorderen Aufschlaglinie */
+    .court::after,.mini-court::after{
+      content:"" !important;position:absolute !important;z-index:1 !important;pointer-events:none !important;
+      left:50% !important;top:27.5% !important;bottom:0 !important;
+      border-left:3px solid #eef2f7 !important;
+    }
+    .court .center-line,.court .service1,.court .service2{display:none!important}
+    .net-line{left:0!important;right:0!important;top:1.5%!important;height:4px!important;z-index:3!important}
+    /* Laufpunkte vollständig innerhalb der Linien */
+    .nvl{left:15%!important;top:17%!important}.nvr{left:85%!important;top:17%!important}
+    .vl{left:15%!important;top:18%!important}.vr{left:85%!important;top:18%!important}
+    .ml{left:15%!important;top:52%!important}.mr{left:85%!important;top:52%!important}
+    .hl{left:15%!important;top:76%!important;bottom:auto!important}
+    .hm{left:50%!important;top:76%!important;bottom:auto!important}
+    .hr{left:85%!important;top:76%!important;bottom:auto!important}
+    .court .target{z-index:4!important}
+
   </style>
 
 </head>
@@ -189,7 +237,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev29</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev30</div>
     </header>
 
     <section id="setup" class="card">
@@ -228,15 +276,15 @@
         <div id="modePreviewTitle" class="mode-preview-title">Laufpunkte dieses Modus</div>
         <div class="mini-court" aria-hidden="true">
           <div class="net-line"></div>
-          <i class="mini-dot" data-mini="nvl" style="left:10%;top:17%"></i>
-          <i class="mini-dot" data-mini="nvr" style="left:90%;top:17%"></i>
-          <i class="mini-dot" data-mini="vl" style="left:12%;top:12%"></i>
-          <i class="mini-dot" data-mini="vr" style="left:88%;top:12%"></i>
-          <i class="mini-dot" data-mini="ml" style="left:10%;top:47%"></i>
-          <i class="mini-dot" data-mini="mr" style="left:90%;top:47%"></i>
-          <i class="mini-dot" data-mini="hl" style="left:12%;top:90%"></i>
-          <i class="mini-dot" data-mini="hm" style="left:50%;top:90%"></i>
-          <i class="mini-dot" data-mini="hr" style="left:88%;top:90%"></i>
+          <i class="mini-dot" data-mini="nvl" style="left:15%;top:17%"></i>
+          <i class="mini-dot" data-mini="nvr" style="left:85%;top:17%"></i>
+          <i class="mini-dot" data-mini="vl" style="left:15%;top:18%"></i>
+          <i class="mini-dot" data-mini="vr" style="left:85%;top:18%"></i>
+          <i class="mini-dot" data-mini="ml" style="left:15%;top:52%"></i>
+          <i class="mini-dot" data-mini="mr" style="left:85%;top:52%"></i>
+          <i class="mini-dot" data-mini="hl" style="left:15%;top:76%"></i>
+          <i class="mini-dot" data-mini="hm" style="left:50%;top:76%"></i>
+          <i class="mini-dot" data-mini="hr" style="left:85%;top:76%"></i>
         </div>
       </div>
 
@@ -1163,7 +1211,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev29: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev30: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1310,7 +1358,7 @@ new MutationObserver(sc20Edges).observe(document.body,{childList:true,subtree:tr
 
 
 
-/* dev29: labels for per-round time and round break */
+/* dev30: labels for per-round time and round break */
 function sc25StatLabels(){
  const en=(document.getElementById("uiLanguage")?.value||"de")==="en";
  const e=document.getElementById("elapsedLabel"), p=document.getElementById("pauseLabel");
