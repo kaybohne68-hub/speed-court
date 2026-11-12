@@ -1,4 +1,4 @@
-# Speed Court 2.0.0-dev30
+# Speed Court 2.0.0-dev31
 
 Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengine (V1.12.2).
 
@@ -61,15 +61,15 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Flexibles Rundenende aus dev20 unverändert beibehalten.
 - Cache dev21.
 
-## dev30
+## dev31
 - Deadlock-Fix für lange Trainings: Rundenende stoppt keine laufende Zielsequenz mehr.
 - Normales Rundenende weiterhin ausschließlich nach Position -> Mitte -> Step.
 - 8-Sekunden-Watchdog als Notfall: hängt eine Sequenz nach einer Position, wird sie kontrolliert über Mitte -> Step abgeschlossen.
 - Nach Step wird ein vorgemerktes Rundenende sicher ausgeführt.
 - Punktpositionen aus dev21 bleiben erhalten.
-- Cache auf dev30 erhöht.
+- Cache auf dev31 erhöht.
 
-## dev30 – Sequenz-Fix
+## dev31 – Sequenz-Fix
 - Nach Start einer Zielbewegung keine Rundendauer-Abbruchprüfung mehr innerhalb der Sequenz.
 - Jede gestartete Bewegung läuft vollständig: Ziel -> BUM -> MITTE -> Step.
 - Zeitprüfung nur vor einer neuen Bewegung und direkt nach Step.
@@ -77,38 +77,38 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Der bisherige Watchdog wurde entfernt; der eigentliche Ablauf ist korrigiert.
 - Außenpositionen aus dev21 bleiben erhalten.
 
-## dev30
+## dev31
 - Rundenanzahl von 1 bis 10 auswählbar.
 - Sequenz-Fix aus dev23 beibehalten.
 
-## dev30
+## dev31
 - Aktive Zeit wird für jede Runde separat ab 0 s angezeigt.
 - In der Rundenpause bleibt die aktive Rundenzeit stehen.
 - Separate Pause-Anzeige zählt die Pausenzeit herunter.
 - Rundenanzeige zeigt aktuelle Runde / Gesamtzahl.
 
-## dev30
+## dev31
 - Modusnamen einheitlich auf Punkte umgestellt.
 - Kleine Feldvorschau unter der Moduswahl; aktive Laufpunkte leuchten.
 - Zwei neue vordere Punkte: Vorn links / Vorn rechts.
 - Neuer 8-Punkte-Footwork-Modus nutzt die zwei neuen vorderen Punkte plus die bisherigen sechs Standardpunkte.
 - Bestehende Trainingslogik aus dev25 beibehalten.
 
-## dev30
+## dev31
 - 8-Punkte-Footwork entfernt.
 - Neuer 2-Punkte-Footwork-Modus.
 - Dieser Modus verwendet ausschließlich zwei Punkte direkt vorn am Netz: Vorn links und Vorn rechts.
 - Kleine Modusvorschau zeigt im 2-Punkte-Modus nur diese beiden Netzpunkte.
 - Bestehende 4-, 5-, 6- und 7-Punkte-Modi bleiben erhalten.
 
-## dev30
+## dev31
 - Die beiden Punkte des 2-Punkte-Modus entsprechend der markierten Positionen verschoben.
 - Vorn links: 10 % von links / 17 % von oben.
 - Vorn rechts: 90 % von links / 17 % von oben.
 - Kleine Modusvorschau entsprechend angepasst.
 - Alle anderen Laufpunkte und Modi unverändert.
 
-## dev30
+## dev31
 - Felddarstellung nach der bereitgestellten Badmintonfeld-Referenz neu gezeichnet.
 - Grünes Feld, rote Netzlinie, seitliche Einzel-Linien, vordere Aufschlaglinie,
   Mittellinie und hintere Doppel-Aufschlaglinie.
@@ -116,10 +116,16 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Kleine Modusvorschau und großes Trainingsfeld verwenden dieselbe Feldlogik.
 - Modi sortiert: 2, 4, 5, 6, 7 Punkte; danach Explosive Sprints und Split-Step Reaktion.
 
-## dev30
+## dev31
 - Großes Trainingsfeld und kleine Modusvorschau auf exakt dieselbe Feldgeometrie gebracht.
 - Alte doppelte Feldlinien im großen Feld deaktiviert.
 - Laufpunkte weiter nach innen gesetzt, damit Kreise und Beschriftungen nicht abgeschnitten werden.
 - Vordere, mittlere und hintere Laufpunkte sauber symmetrisch ausgerichtet.
 - Mittellinie beginnt erst hinter der vorderen Aufschlaglinie.
 - Modusreihenfolge aus dev29 bleibt erhalten.
+
+
+## dev31
+- Start-Countdown spielt die Zahlen strikt in Reihenfolge (z. B. 3, 2, 1).
+- Countdown-Audiodateien werden einzeln abgewartet statt über ein Intervall in eine Audio-Warteschlange gelegt.
+- iOS-Sicherheits-Timeout verhindert, dass der Countdown bei fehlendem Audio-Ende hängen bleibt.

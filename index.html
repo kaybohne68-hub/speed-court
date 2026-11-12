@@ -122,7 +122,7 @@
     .hl{left:12%;bottom:7%}.hm{left:50%;bottom:7%}.hr{left:88%;bottom:7%}
 
 
-    /* dev30: Badmintonfeld nach Referenzbild */
+    /* dev31: Badmintonfeld nach Referenzbild */
     .court,.mini-court{
       background:#08ad55 !important;
       border-color:#eef2f7 !important;
@@ -183,7 +183,7 @@
       .target{width:54px;height:54px;font-size:11px}
     }
   
-    /* dev30: einheitliche, saubere Feldgeometrie */
+    /* dev31: einheitliche, saubere Feldgeometrie */
     .court{
       aspect-ratio:610/670 !important;
       overflow:hidden !important;
@@ -237,7 +237,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev30</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev31</div>
     </header>
 
     <section id="setup" class="card">
@@ -822,7 +822,6 @@ function startTraining(){
 
 function countdownThenRound(){
   clearSpeech();
-
   if(countdownTimer){
     clearInterval(countdownTimer);
     countdownTimer=null;
@@ -830,21 +829,18 @@ function countdownThenRound(){
 
   const overlay=$("countdownOverlay");
   const numberEl=$("countdownNumber");
-  const selected=parseInt($("countdown").value,10) || 3;
+  const selected=Math.max(1,parseInt($("countdown").value,10) || 3);
   let remaining=selected;
   let launched=false;
+  let sequenceToken=Date.now();
 
   if(overlay) overlay.style.display="flex";
 
   const launchRound=()=>{
     if(launched) return;
     launched=true;
-    if(countdownTimer){
-      clearInterval(countdownTimer);
-      countdownTimer=null;
-    }
+    if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; }
     if(numberEl) numberEl.textContent="LOS!";
-    // vorhandene Los!-Frauenstimme verwenden, falls eingebettet
     try { speak("Los!",true); } catch(e) {}
     setTimeout(()=>{
       if(overlay) overlay.style.display="none";
@@ -852,26 +848,52 @@ function countdownThenRound(){
     },650);
   };
 
-  const announce=()=>{
-    if(launched) return;
-    if(remaining<=0){
-      launchRound();
-      return;
+  // Countdown-Zahlen strikt nacheinander abspielen. Kein Intervall-Queueing,
+  // damit auf iOS keine Audiodateien vertauscht oder überlagert werden.
+  const playNumber=async (n, token)=>{
+    if(launched || token!==sequenceToken) return;
+    if(numberEl) numberEl.textContent=String(n);
+
+    const src=VOICE_AUDIO[String(n)];
+    if(src){
+      try{
+        voiceAudio.pause();
+        voiceAudio.currentTime=0;
+        voiceAudio.src=src;
+        voiceAudio.volume=1;
+        await new Promise(resolve=>{
+          let settled=false;
+          const finish=()=>{
+            if(settled) return;
+            settled=true;
+            voiceAudio.onended=null;
+            voiceAudio.onerror=null;
+            resolve();
+          };
+          voiceAudio.onended=finish;
+          voiceAudio.onerror=finish;
+          const playPromise=voiceAudio.play();
+          if(playPromise && playPromise.catch) playPromise.catch(finish);
+          // Falls iOS kein ended-Event liefert, nicht im Countdown hängen bleiben.
+          setTimeout(finish,1800);
+        });
+      }catch(e){}
+    }else{
+      try { speak(String(n),true); } catch(e) {}
+      await new Promise(resolve=>setTimeout(resolve,900));
     }
-    if(numberEl) numberEl.textContent=remaining;
-    // Jede Zahl 10..1 ist in V1.11.3 als eigene MP3 eingebettet.
-    try { speak(String(remaining),true); } catch(e) {}
-    remaining--;
+
+    if(launched || token!==sequenceToken) return;
+    remaining=n-1;
+    if(remaining>0){
+      // Mindestens eine Sekunde Abstand zwischen den gesprochenen Zahlen.
+      await new Promise(resolve=>setTimeout(resolve,Math.max(0,1000)));
+      return playNumber(remaining,token);
+    }
+    launchRound();
   };
 
-  announce();
-  countdownTimer=setInterval(()=>{
-    if(remaining<=0) launchRound();
-    else announce();
-  },1000);
-
-  // Sicherheitsstart unabhängig vom Audio.
-  setTimeout(launchRound, selected*1000+700);
+  playNumber(remaining,sequenceToken);
 }
 
 function startRound(){
@@ -1211,7 +1233,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev30: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev31: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1358,7 +1380,7 @@ new MutationObserver(sc20Edges).observe(document.body,{childList:true,subtree:tr
 
 
 
-/* dev30: labels for per-round time and round break */
+/* dev31: labels for per-round time and round break */
 function sc25StatLabels(){
  const en=(document.getElementById("uiLanguage")?.value||"de")==="en";
  const e=document.getElementById("elapsedLabel"), p=document.getElementById("pauseLabel");
