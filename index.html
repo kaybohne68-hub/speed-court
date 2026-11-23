@@ -237,7 +237,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev32</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev33</div>
     </header>
 
     <section id="setup" class="card">
@@ -329,21 +329,35 @@
         </div>
       </div>
 
-      <div class="grid2">
-        <div>
-          <label for="minDelay">Min. Pause: <span id="minVal">0.8</span>s</label>
-          <input id="minDelay" type="range" min="0.4" max="5" step="0.1" value="0.8">
-        </div>
-        <div>
-          <label for="maxDelay">Max. Pause: <span id="maxVal">2.2</span>s</label>
-          <input id="maxDelay" type="range" min="0.8" max="5" step="0.1" value="2.2">
-        </div>
-      </div>
-
       <div>
-        <label for="stepDelay">Mitte → Bereit: <span id="stepDelayVal">0.5</span>s</label>
-        <input id="stepDelay" type="range" min="0" max="2" step="0.1" value="0.5">
+        <label for="speedPreset">Laufgeschwindigkeit</label>
+        <select id="speedPreset">
+          <option value="slow">Langsam – Einsteiger</option>
+          <option value="medium" selected>Mittel – Standard</option>
+          <option value="fast">Schnell – Fortgeschrittene</option>
+          <option value="custom">Individuell</option>
+        </select>
+        <div class="tiny" style="margin-top:8px">Die App schätzt die Laufzeit zum Ziel, die Schlagbewegung und den Rücklauf. Ohne Kamera werden Positionen nicht tatsächlich erkannt.</div>
       </div>
+      <div>
+        <label for="stepDelay">Bereitschaft nach Rücklauf: <span id="stepDelayVal">0.3</span>s</label>
+        <input id="stepDelay" type="range" min="0" max="2" step="0.1" value="0.3">
+      </div>
+      <details style="margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px">
+        <summary style="cursor:pointer;font-weight:700">Erweiterte Einstellungen · zufällige Bereitschaftspause</summary>
+        <div class="grid2" style="margin-top:12px">
+          <div>
+            <label for="minDelay">Min. Pause: <span id="minVal">0.5</span>s</label>
+            <input id="minDelay" type="range" min="0.4" max="5" step="0.1" value="0.5">
+          </div>
+          <div>
+            <label for="maxDelay">Max. Pause: <span id="maxVal">1.0</span>s</label>
+            <input id="maxDelay" type="range" min="0.8" max="5" step="0.1" value="1.0">
+          </div>
+        </div>
+      </details>
+
+      <button id="splitToneTestBtn" class="secondary" type="button" style="margin:4px 0 14px">🔊 Split-Step-Ton testen</button>
 
       <div class="grid2">
         <div>
@@ -620,18 +634,32 @@ function clearSpeech(){
   } catch(e) {}
 }
 
+let splitAudioContext = null;
+function unlockSplitAudio(){
+  try {
+    const AC=window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!splitAudioContext) splitAudioContext=new AC();
+    if (splitAudioContext.state === "suspended") splitAudioContext.resume().catch(()=>{});
+  } catch(e) { console.warn("Split-Audio",e); }
+}
 function beep(){
-  if ($("signal").value !== "beep") return;
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.frequency.value = 880;
-    gain.gain.value = 0.15;
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start();
-    setTimeout(()=>{osc.stop();ctx.close()},120);
-  }catch(e){}
+  // Eigenständiger Split-Step-Ton, unabhängig von der Einstellung „Sprache“.
+  // Derselbe AudioContext wird beim Tippen auf „Training starten“ freigeschaltet.
+  try {
+    unlockSplitAudio();
+    const ctx=splitAudioContext;
+    if (!ctx || ctx.state !== "running") { playMediaCue("cue"); return; }
+    const t=ctx.currentTime;
+    const osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.type="sine"; osc.frequency.setValueAtTime(950,t);
+    osc.frequency.exponentialRampToValueAtTime(720,t+0.13);
+    gain.gain.setValueAtTime(0.0001,t);
+    gain.gain.exponentialRampToValueAtTime(0.35,t+0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start(t);osc.stop(t+0.17);
+  } catch(e) { playMediaCue("cue"); }
 }
 
 function vibrate(pattern=80){
@@ -715,34 +743,29 @@ function doDirection(){
 
   beep(); // Split-Step-Signal exakt beim Bekanntgeben der neuen Ecke
   speak(d.label);
-  playMediaCue("cue");
   vibrate(90);
 
-  // Für diesen Bewegungszyklus wird aus Minimum/Maximum ein
-  // individueller Grundwert gezogen.
+  // dev33: Laufzeit und zufällige Bereitschaftspause sind getrennt.
+  // Die Zielzeiten sind Schätzwerte, keine kamerabasierten Messungen.
   const minMs = parseFloat($("minDelay").value) * 1000;
   const maxMs = parseFloat($("maxDelay").value) * 1000;
   const lo = Math.min(minMs, maxMs);
   const hi = Math.max(minMs, maxMs);
-  const baseMs = lo + Math.random() * (hi - lo);
-
-  // Individuelle Laufzeiten je nach Entfernung der Zielposition.
-  // Die Rückkehr ins Zentrum wird vollständig abgewartet, bevor die Pause beginnt.
-  const targetFactor = (d.id === "ml" || d.id === "mr") ? 0.60 :
-                       (d.id === "vl" || d.id === "vr") ? 0.72 :
-                       (d.id === "hm") ? 0.86 : 0.82;
-  const returnFactor = (d.id === "ml" || d.id === "mr") ? 0.72 :
-                       (d.id === "vl" || d.id === "vr") ? 0.88 :
-                       (d.id === "hm") ? 1.04 : 1.00;
-  const toTargetMs = baseMs * targetFactor;
-  const toCenterMs = baseMs * returnFactor;
-  const targetMs = $("mode").value === "sprint" ? Math.max(toTargetMs, 600) : toTargetMs;
-  const centerMs = $("mode").value === "sprint" ? Math.max(toCenterMs, 750) : toCenterMs;
+  const pace = $("speedPreset").value;
+  const baseMs = pace === "slow" ? 2100 : pace === "fast" ? 1150 : pace === "custom" ? 1550 : 1550;
+  const targetFactor = (d.id === "ml" || d.id === "mr") ? 0.72 :
+                       (d.id === "vl" || d.id === "vr") ? 0.92 :
+                       (d.id === "hm") ? 1.00 : 1.08;
+  const returnFactor = (d.id === "ml" || d.id === "mr") ? 0.82 :
+                       (d.id === "vl" || d.id === "vr") ? 1.05 :
+                       (d.id === "hm") ? 1.06 : 1.12;
+  const targetMs = baseMs * targetFactor;
+  const centerMs = baseMs * returnFactor + 350; // Schlagbewegung am Ziel
 
   state.cueTimeout = setTimeout(()=>{
     if (!state.running) return;
     speak("BUM!", true);
-    $("phase").textContent = "Position erreicht";
+    $("phase").textContent = "Schlagzeit (geschätzt)";
     clearActive();
     vibrate(35);
 
@@ -756,7 +779,7 @@ function doDirection(){
 
       // dev32: Rücklauf abschließen, Bereitschaftszeit abwarten,
       // erst dann mit einem Signalton UND der neuen Eckansage fortfahren.
-      const centerSoundMs = 900;
+      const centerSoundMs = 450;
       const readinessMs = parseFloat($("stepDelay").value) * 1000;
       const reactionPause = lo + Math.random() * (hi - lo);
       state.nextTimeout = setTimeout(()=>{
@@ -778,6 +801,7 @@ function startTraining(){
   saveCurrentSettings();
   updateModeTargets();
   unlockMediaAudio();
+  unlockSplitAudio();
   if (parseFloat($("maxDelay").value) < parseFloat($("minDelay").value)){
     $("maxDelay").value = $("minDelay").value;
     $("maxVal").textContent = $("minDelay").value;
@@ -1034,6 +1058,8 @@ function finishTraining(){
   },5000);
 }
 
+$("splitToneTestBtn").onclick=()=>{ unlockSplitAudio(); beep(); };
+
 $("audioTestBtn").onclick=()=>{
   try{
     mediaAudio.pause();
@@ -1064,6 +1090,7 @@ function collectSettings(){
     minDelay:$("minDelay").value,
     maxDelay:$("maxDelay").value,
     stepDelay:$("stepDelay").value,
+    speedPreset:$("speedPreset").value,
     rest:$("rest").value,
     signal:$("signal").value,
     vibrate:$("vibrate").checked
@@ -1071,7 +1098,7 @@ function collectSettings(){
 }
 function applySettings(s){
   if(!s) return;
-  ["mode","duration","rounds","countdown","minDelay","maxDelay","stepDelay","rest","signal"].forEach(id=>{
+  ["mode","duration","rounds","countdown","minDelay","maxDelay","stepDelay","speedPreset","rest","signal"].forEach(id=>{
     if(s[id] !== undefined && $(id)) $(id).value = s[id];
   });
   if(s.vibrate !== undefined) $("vibrate").checked = !!s.vibrate;
@@ -1179,7 +1206,7 @@ $("historyBackBtn").onclick=()=>{
   $("history").classList.add("hidden"); $("setup").classList.remove("hidden");
 };
 $("playerSelect").onchange=()=>{ updatePlayerUI(); updateModeTargets(); };
-["mode","duration","rounds","countdown","minDelay","maxDelay","stepDelay","rest","signal","vibrate"].forEach(id=>{
+["mode","duration","rounds","countdown","minDelay","maxDelay","stepDelay","speedPreset","rest","signal","vibrate"].forEach(id=>{
   $(id).addEventListener("change",()=>{
     saveCurrentSettings();
     if(id === "mode") updateModeTargets();
@@ -1211,7 +1238,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev32: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev33: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",

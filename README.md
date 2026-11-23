@@ -131,8 +131,15 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - iOS-Sicherheits-Timeout verhindert, dass der Countdown bei fehlendem Audio-Ende hängen bleibt.
 
 
-## dev32
+## dev33
 - Split-Step-Signalton und Eckansage ohne künstliche Zwischenpause; die Ecke wird erst beim Signal bekannt.
 - Rücklauf zur Mitte und Bereitschaftszeit bleiben vor dem nächsten Signal.
 - Eckpunkte des Einzelfeldes näher an die Einzel-Seitenlinien verschoben; Mini-Vorschau angepasst.
 - Keine Kamerafunktion.
+
+
+## dev33
+- Split-Step-Ton bei jeder Eckansage unabhängig vom Sprachmodus (AudioContext mit Media-Fallback).
+- Schaltfläche zum Testen des Split-Step-Tons.
+- Laufgeschwindigkeits-Presets; getrennte, einklappbare Bereitschaftspausen.
+- Keine Kamera: Ziel- und Rücklaufzeiten sind nur geschätzt.
