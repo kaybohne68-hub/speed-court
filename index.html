@@ -237,7 +237,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev35</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev36</div>
     </header>
 
     <section id="setup" class="card">
@@ -370,7 +370,7 @@
       <div style="margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px">
         <label for="splitVolume">🔊 Ta-Damm!-Lautstärke: <span id="splitVolumeVal">85</span>%</label>
         <input id="splitVolume" type="range" min="0" max="100" step="5" value="85" aria-label="Lautstärke des Split-Step-Tons">
-        <div class="tiny">Nur für das Ta-Damm!-Signal. Die Eckansagen bleiben unverändert. Die maximale Lautstärke wird vom iPhone bzw. Bluetooth-Lautsprecher begrenzt.</div>
+        <div class="tiny">Kräftigerer Klang. Die Eckansage beginnt erst beim „Damm“. Die Sprachlautstärke bleibt unverändert. Die maximale Lautstärke wird vom iPhone bzw. Bluetooth-Lautsprecher begrenzt.</div>
         <button id="splitToneTestBtn" class="secondary" type="button" style="margin:12px 0 0">🔊 Ta-Damm! testen</button>
       </div>
 
@@ -664,9 +664,11 @@ function unlockSplitAudio(){
     if (splitAudioContext.state === "suspended") splitAudioContext.resume().catch(()=>{});
   } catch(e) { console.warn("Split-Audio",e); }
 }
+// dev36: Ta (Hopser) bei t=0; DAMM (Landung) bei t=0.16 s.
+const SPLIT_DAMM_OFFSET_MS = 160;
 function beep(){
-  // dev35: Eigene gespeicherte Lautstärke, kräftigeres Ta-Damm mit sanfter Begrenzung.
-  // Eckansagen und sonstige Medienlautstärke werden nicht verändert.
+  // Klang mit stärkeren Obertönen und Limiter: subjektiv präsenter, ohne
+  // die systemseitige Maximallautstärke zu überschreiten.
   const volume=splitVolumeValue()/100;
   if(volume<=0) return;
   try {
@@ -675,14 +677,13 @@ function beep(){
     if (!ctx || ctx.state !== "running") { playMediaCue("cue"); return; }
     const t=ctx.currentTime;
     const master=ctx.createGain();
-    // Hörbare Abstufung auch im unteren Bereich; 100% entspricht dem maximalen App-Pegel.
-    master.gain.value=Math.pow(volume,1.35);
+    master.gain.value=Math.pow(volume,1.15);
     const limiter=ctx.createDynamicsCompressor();
-    limiter.threshold.value=-13;
-    limiter.knee.value=8;
-    limiter.ratio.value=10;
-    limiter.attack.value=0.002;
-    limiter.release.value=0.11;
+    limiter.threshold.value=-19;
+    limiter.knee.value=4;
+    limiter.ratio.value=12;
+    limiter.attack.value=0.001;
+    limiter.release.value=0.14;
     master.connect(limiter);
     limiter.connect(ctx.destination);
     function hit(start,duration,freq,endFreq,level,type){
@@ -691,15 +692,16 @@ function beep(){
       osc.frequency.setValueAtTime(freq,start);
       osc.frequency.exponentialRampToValueAtTime(endFreq,start+duration);
       gain.gain.setValueAtTime(0.0001,start);
-      gain.gain.exponentialRampToValueAtTime(level,start+0.007);
+      gain.gain.exponentialRampToValueAtTime(level,start+0.003);
       gain.gain.exponentialRampToValueAtTime(0.0001,start+duration);
       osc.connect(gain);gain.connect(master);
       osc.start(start);osc.stop(start+duration+0.01);
     }
-    hit(t,0.095,900,620,0.50,"triangle"); // Ta: prägnanter Absprung
-    hit(t+0.14,0.23,310,105,0.85,"triangle"); // Damm: tiefer Landungsimpuls
-    hit(t+0.14,0.105,650,210,0.34,"sine"); // Anschlagsakzent
-    hit(t+0.14,0.085,1250,430,0.15,"triangle"); // Präsenz in lauter Halle
+    hit(t,0.09,1040,690,0.72,"sawtooth"); // TA: heller, deutlicher Hopser
+    const land=t+SPLIT_DAMM_OFFSET_MS/1000;
+    hit(land,0.26,360,125,0.92,"sawtooth"); // DAMM: kräftiger Grundklang
+    hit(land,0.14,780,260,0.48,"square"); // durchsetzungsfähiger Anschlag
+    hit(land,0.095,1550,540,0.27,"triangle"); // Präsenz
   } catch(e) { playMediaCue("cue"); }
 }
 
@@ -776,15 +778,25 @@ function doDirection(){
   state.roundCues++;
   state.counts[d.id]++;
   $("cueCount").textContent = state.cues;
-  $("direction").textContent = d.label.toUpperCase();
-  $("phase").textContent = "LOS!";
+  $("direction").textContent = "SPLIT STEP";
+  $("phase").textContent = "TA … DAMM!";
   clearActive();
   const el = document.querySelector(`[data-dir="${d.id}"]`);
-  if (el) el.classList.add("active");
+  // Zielmarkierung erst beim DAMM freigeben.
 
-  beep(); // Split-Step-Signal exakt beim Bekanntgeben der neuen Ecke
-  speak(d.label);
-  vibrate(90);
+  // TA beginnt den Hopser. Erst beim DAMM wird die Richtung hörbar angesagt.
+  // Die Bildschirm-Richtung wird ebenfalls erst zur Landung sichtbar.
+  beep();
+  const announcedDirection=d.label;
+  setTimeout(()=>{
+    if (!state.running) return;
+    $("direction").textContent=announcedDirection.toUpperCase();
+    if (el) el.classList.add("active");
+    $("phase").textContent="LOS!";
+    speak(announcedDirection);
+    vibrate(90);
+  },SPLIT_DAMM_OFFSET_MS);
+  // Beim Trainingsstopp wird die verzögerte Ansage unterdrückt.
 
   // dev33: Laufzeit und zufällige Bereitschaftspause sind getrennt.
   // Die Zielzeiten sind Schätzwerte, keine kamerabasierten Messungen.
@@ -1315,7 +1327,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev35: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev36: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
