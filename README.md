@@ -150,3 +150,11 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Individuell: drei pro Spieler gespeicherte Regler für Vorwärts, Rückwärts und Seitwärts (je 1,0–6,0 s, gesamter Laufweg einschließlich Schlag).
 - Zielansage startet zusammen mit dem Split-Step-Klang.
 - Kameraerkennung nicht enthalten.
+
+## dev35
+- Eigenständiger Lautstärkeregler (0–100 %, Standard 85 %) für das Ta-Damm!-Split-Step-Signal.
+- Kräftigerer, präsenterer zweistufiger Signalton mit Pegelbegrenzung.
+- Testtaste verwendet die eingestellte Lautstärke; 0 % schaltet das Signal stumm.
+- Einstellung wird lokal gespeichert, unabhängig von der Lautstärke der Eckansagen.
+- iOS-/Bluetooth-Hardwarelautstärke bleibt systembedingt maßgeblich.
+- Service-Worker-Cache auf dev35 aktualisiert.

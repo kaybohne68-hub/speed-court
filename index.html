@@ -237,7 +237,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev34</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev35</div>
     </header>
 
     <section id="setup" class="card">
@@ -367,7 +367,12 @@
         </div>
       </details>
 
-      <button id="splitToneTestBtn" class="secondary" type="button" style="margin:4px 0 14px">🔊 Ta-Damm! testen</button>
+      <div style="margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px">
+        <label for="splitVolume">🔊 Ta-Damm!-Lautstärke: <span id="splitVolumeVal">85</span>%</label>
+        <input id="splitVolume" type="range" min="0" max="100" step="5" value="85" aria-label="Lautstärke des Split-Step-Tons">
+        <div class="tiny">Nur für das Ta-Damm!-Signal. Die Eckansagen bleiben unverändert. Die maximale Lautstärke wird vom iPhone bzw. Bluetooth-Lautsprecher begrenzt.</div>
+        <button id="splitToneTestBtn" class="secondary" type="button" style="margin:12px 0 0">🔊 Ta-Damm! testen</button>
+      </div>
 
       <div class="grid2">
         <div>
@@ -645,6 +650,12 @@ function clearSpeech(){
 }
 
 let splitAudioContext = null;
+const SPLIT_VOLUME_KEY = "speedCourtSplitVolumeV35";
+function splitVolumeValue(){
+  const el=document.getElementById("splitVolume");
+  const v=Number(el ? el.value : 85);
+  return Math.max(0,Math.min(100,Number.isFinite(v)?v:85));
+}
 function unlockSplitAudio(){
   try {
     const AC=window.AudioContext || window.webkitAudioContext;
@@ -654,27 +665,41 @@ function unlockSplitAudio(){
   } catch(e) { console.warn("Split-Audio",e); }
 }
 function beep(){
-  // dev34: Ta = kurzer heller Hopser; Damm = kräftige, tiefere Landung.
-  // WebAudio startet beide Impulse aus demselben Audiokontext, ohne Sprach-Warteschlange.
+  // dev35: Eigene gespeicherte Lautstärke, kräftigeres Ta-Damm mit sanfter Begrenzung.
+  // Eckansagen und sonstige Medienlautstärke werden nicht verändert.
+  const volume=splitVolumeValue()/100;
+  if(volume<=0) return;
   try {
     unlockSplitAudio();
     const ctx=splitAudioContext;
     if (!ctx || ctx.state !== "running") { playMediaCue("cue"); return; }
     const t=ctx.currentTime;
-    function hit(start, duration, freq, endFreq, volume, type){
-      const osc=ctx.createOscillator(), gain=ctx.createGain();
+    const master=ctx.createGain();
+    // Hörbare Abstufung auch im unteren Bereich; 100% entspricht dem maximalen App-Pegel.
+    master.gain.value=Math.pow(volume,1.35);
+    const limiter=ctx.createDynamicsCompressor();
+    limiter.threshold.value=-13;
+    limiter.knee.value=8;
+    limiter.ratio.value=10;
+    limiter.attack.value=0.002;
+    limiter.release.value=0.11;
+    master.connect(limiter);
+    limiter.connect(ctx.destination);
+    function hit(start,duration,freq,endFreq,level,type){
+      const osc=ctx.createOscillator(),gain=ctx.createGain();
       osc.type=type;
       osc.frequency.setValueAtTime(freq,start);
       osc.frequency.exponentialRampToValueAtTime(endFreq,start+duration);
       gain.gain.setValueAtTime(0.0001,start);
-      gain.gain.exponentialRampToValueAtTime(volume,start+0.009);
+      gain.gain.exponentialRampToValueAtTime(level,start+0.007);
       gain.gain.exponentialRampToValueAtTime(0.0001,start+duration);
-      osc.connect(gain);gain.connect(ctx.destination);
-      osc.start(start);osc.stop(start+duration+0.005);
+      osc.connect(gain);gain.connect(master);
+      osc.start(start);osc.stop(start+duration+0.01);
     }
-    hit(t,0.085,780,570,0.22,"triangle"); // Ta
-    hit(t+0.15,0.22,240,95,0.55,"triangle"); // Damm
-    hit(t+0.15,0.11,480,180,0.16,"sine"); // Anschlags-Akzent
+    hit(t,0.095,900,620,0.50,"triangle"); // Ta: prägnanter Absprung
+    hit(t+0.14,0.23,310,105,0.85,"triangle"); // Damm: tiefer Landungsimpuls
+    hit(t+0.14,0.105,650,210,0.34,"sine"); // Anschlagsakzent
+    hit(t+0.14,0.085,1250,430,0.15,"triangle"); // Präsenz in lauter Halle
   } catch(e) { playMediaCue("cue"); }
 }
 
@@ -1094,6 +1119,17 @@ function updateCustomPaceUI(){
   $(id).addEventListener("input",()=>{ updateCustomPaceUI(); });
 });
 $("speedPreset").addEventListener("change",updateCustomPaceUI);
+const splitVolumeEl=$("splitVolume");
+try {
+  const saved=localStorage.getItem(SPLIT_VOLUME_KEY);
+  if(saved!==null && Number.isFinite(Number(saved))) splitVolumeEl.value=Math.max(0,Math.min(100,Math.round(Number(saved)/5)*5));
+} catch(e) {}
+function updateSplitVolume(){
+  $("splitVolumeVal").textContent=String(splitVolumeValue());
+  try { localStorage.setItem(SPLIT_VOLUME_KEY,String(splitVolumeValue())); } catch(e) {}
+}
+splitVolumeEl.addEventListener("input",updateSplitVolume);
+updateSplitVolume();
 $("splitToneTestBtn").onclick=()=>{ unlockSplitAudio(); beep(); };
 
 $("audioTestBtn").onclick=()=>{
@@ -1279,7 +1315,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev34: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev35: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
