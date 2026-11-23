@@ -143,3 +143,10 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Schaltfläche zum Testen des Split-Step-Tons.
 - Laufgeschwindigkeits-Presets; getrennte, einklappbare Bereitschaftspausen.
 - Keine Kamera: Ziel- und Rücklaufzeiten sind nur geschätzt.
+
+
+## dev34
+- Split-Step-Klang Ta-Damm! (kurzer heller Absprung, tiefer Landungsimpuls).
+- Individuell: drei pro Spieler gespeicherte Regler für Vorwärts, Rückwärts und Seitwärts (je 1,0–6,0 s, gesamter Laufweg einschließlich Schlag).
+- Zielansage startet zusammen mit dem Split-Step-Klang.
+- Kameraerkennung nicht enthalten.

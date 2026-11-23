@@ -237,7 +237,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev33</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev34</div>
     </header>
 
     <section id="setup" class="card">
@@ -337,6 +337,16 @@
           <option value="fast">Schnell – Fortgeschrittene</option>
           <option value="custom">Individuell</option>
         </select>
+        <div id="customPaceControls" style="display:none;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:12px">
+          <div style="font-weight:700;margin-bottom:8px">Individuelle Laufzeiten (Hinweg + Schlag + Rückweg)</div>
+          <label for="paceForward">Vorwärts: <span id="paceForwardVal">2.4</span>s</label>
+          <input id="paceForward" type="range" min="1" max="6" step="0.1" value="2.4">
+          <label for="paceBackward">Rückwärts: <span id="paceBackwardVal">2.8</span>s</label>
+          <input id="paceBackward" type="range" min="1" max="6" step="0.1" value="2.8">
+          <label for="paceSideways">Seitwärts: <span id="paceSidewaysVal">2.2</span>s</label>
+          <input id="paceSideways" type="range" min="1" max="6" step="0.1" value="2.2">
+          <div class="tiny">Gesamtzeit je Laufweg einschließlich Schlagbewegung. Bei diagonalen Eckläufen wird Vorwärts/Rückwärts verwendet. Ohne Kamera nur geschätzte Zeiten.</div>
+        </div>
         <div class="tiny" style="margin-top:8px">Die App schätzt die Laufzeit zum Ziel, die Schlagbewegung und den Rücklauf. Ohne Kamera werden Positionen nicht tatsächlich erkannt.</div>
       </div>
       <div>
@@ -357,7 +367,7 @@
         </div>
       </details>
 
-      <button id="splitToneTestBtn" class="secondary" type="button" style="margin:4px 0 14px">🔊 Split-Step-Ton testen</button>
+      <button id="splitToneTestBtn" class="secondary" type="button" style="margin:4px 0 14px">🔊 Ta-Damm! testen</button>
 
       <div class="grid2">
         <div>
@@ -644,21 +654,27 @@ function unlockSplitAudio(){
   } catch(e) { console.warn("Split-Audio",e); }
 }
 function beep(){
-  // Eigenständiger Split-Step-Ton, unabhängig von der Einstellung „Sprache“.
-  // Derselbe AudioContext wird beim Tippen auf „Training starten“ freigeschaltet.
+  // dev34: Ta = kurzer heller Hopser; Damm = kräftige, tiefere Landung.
+  // WebAudio startet beide Impulse aus demselben Audiokontext, ohne Sprach-Warteschlange.
   try {
     unlockSplitAudio();
     const ctx=splitAudioContext;
     if (!ctx || ctx.state !== "running") { playMediaCue("cue"); return; }
     const t=ctx.currentTime;
-    const osc=ctx.createOscillator(), gain=ctx.createGain();
-    osc.type="sine"; osc.frequency.setValueAtTime(950,t);
-    osc.frequency.exponentialRampToValueAtTime(720,t+0.13);
-    gain.gain.setValueAtTime(0.0001,t);
-    gain.gain.exponentialRampToValueAtTime(0.35,t+0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
-    osc.connect(gain);gain.connect(ctx.destination);
-    osc.start(t);osc.stop(t+0.17);
+    function hit(start, duration, freq, endFreq, volume, type){
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.type=type;
+      osc.frequency.setValueAtTime(freq,start);
+      osc.frequency.exponentialRampToValueAtTime(endFreq,start+duration);
+      gain.gain.setValueAtTime(0.0001,start);
+      gain.gain.exponentialRampToValueAtTime(volume,start+0.009);
+      gain.gain.exponentialRampToValueAtTime(0.0001,start+duration);
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.start(start);osc.stop(start+duration+0.005);
+    }
+    hit(t,0.085,780,570,0.22,"triangle"); // Ta
+    hit(t+0.15,0.22,240,95,0.55,"triangle"); // Damm
+    hit(t+0.15,0.11,480,180,0.16,"sine"); // Anschlags-Akzent
   } catch(e) { playMediaCue("cue"); }
 }
 
@@ -752,15 +768,25 @@ function doDirection(){
   const lo = Math.min(minMs, maxMs);
   const hi = Math.max(minMs, maxMs);
   const pace = $("speedPreset").value;
-  const baseMs = pace === "slow" ? 2100 : pace === "fast" ? 1150 : pace === "custom" ? 1550 : 1550;
-  const targetFactor = (d.id === "ml" || d.id === "mr") ? 0.72 :
-                       (d.id === "vl" || d.id === "vr") ? 0.92 :
-                       (d.id === "hm") ? 1.00 : 1.08;
-  const returnFactor = (d.id === "ml" || d.id === "mr") ? 0.82 :
-                       (d.id === "vl" || d.id === "vr") ? 1.05 :
-                       (d.id === "hm") ? 1.06 : 1.12;
-  const targetMs = baseMs * targetFactor;
-  const centerMs = baseMs * returnFactor + 350; // Schlagbewegung am Ziel
+  let targetMs, centerMs;
+  if (pace === "custom") {
+    const isSide = d.id === "ml" || d.id === "mr";
+    const isBack = d.id === "hl" || d.id === "hr" || d.id === "hm";
+    const totalMs = 1000 * parseFloat($(isSide ? "paceSideways" : isBack ? "paceBackward" : "paceForward").value);
+    // 50% Hinweg, 50% Schlagbewegung und Rückweg; Gesamtzeit bleibt exakt der Reglerwert.
+    targetMs = totalMs * 0.5;
+    centerMs = totalMs - targetMs;
+  } else {
+    const baseMs = pace === "slow" ? 2100 : pace === "fast" ? 1150 : 1550;
+    const targetFactor = (d.id === "ml" || d.id === "mr") ? 0.72 :
+                         (d.id === "vl" || d.id === "vr" || d.id === "nvl" || d.id === "nvr") ? 0.92 :
+                         (d.id === "hm") ? 1.00 : 1.08;
+    const returnFactor = (d.id === "ml" || d.id === "mr") ? 0.82 :
+                         (d.id === "vl" || d.id === "vr" || d.id === "nvl" || d.id === "nvr") ? 1.05 :
+                         (d.id === "hm") ? 1.06 : 1.12;
+    targetMs = baseMs * targetFactor;
+    centerMs = baseMs * returnFactor + 350;
+  }
 
   state.cueTimeout = setTimeout(()=>{
     if (!state.running) return;
@@ -1058,6 +1084,16 @@ function finishTraining(){
   },5000);
 }
 
+function updateCustomPaceUI(){
+  $("customPaceControls").style.display = $("speedPreset").value === "custom" ? "block" : "none";
+  ["paceForward","paceBackward","paceSideways"].forEach(id=>{
+    $(id+"Val").textContent = Number($(id).value).toFixed(1);
+  });
+}
+["paceForward","paceBackward","paceSideways"].forEach(id=>{
+  $(id).addEventListener("input",()=>{ updateCustomPaceUI(); });
+});
+$("speedPreset").addEventListener("change",updateCustomPaceUI);
 $("splitToneTestBtn").onclick=()=>{ unlockSplitAudio(); beep(); };
 
 $("audioTestBtn").onclick=()=>{
@@ -1091,6 +1127,9 @@ function collectSettings(){
     maxDelay:$("maxDelay").value,
     stepDelay:$("stepDelay").value,
     speedPreset:$("speedPreset").value,
+    paceForward:$("paceForward").value,
+    paceBackward:$("paceBackward").value,
+    paceSideways:$("paceSideways").value,
     rest:$("rest").value,
     signal:$("signal").value,
     vibrate:$("vibrate").checked
@@ -1098,13 +1137,14 @@ function collectSettings(){
 }
 function applySettings(s){
   if(!s) return;
-  ["mode","duration","rounds","countdown","minDelay","maxDelay","stepDelay","speedPreset","rest","signal"].forEach(id=>{
+  ["mode","duration","rounds","countdown","minDelay","maxDelay","stepDelay","speedPreset","paceForward","paceBackward","paceSideways","rest","signal"].forEach(id=>{
     if(s[id] !== undefined && $(id)) $(id).value = s[id];
   });
   if(s.vibrate !== undefined) $("vibrate").checked = !!s.vibrate;
   $("minVal").textContent = $("minDelay").value;
   $("maxVal").textContent = $("maxDelay").value;
   $("stepDelayVal").textContent = $("stepDelay").value;
+  updateCustomPaceUI();
 }
 function saveCurrentSettings(){
   const name=currentPlayer();
@@ -1206,7 +1246,7 @@ $("historyBackBtn").onclick=()=>{
   $("history").classList.add("hidden"); $("setup").classList.remove("hidden");
 };
 $("playerSelect").onchange=()=>{ updatePlayerUI(); updateModeTargets(); };
-["mode","duration","rounds","countdown","minDelay","maxDelay","stepDelay","speedPreset","rest","signal","vibrate"].forEach(id=>{
+["mode","duration","rounds","countdown","minDelay","maxDelay","stepDelay","speedPreset","paceForward","paceBackward","paceSideways","rest","signal","vibrate"].forEach(id=>{
   $(id).addEventListener("change",()=>{
     saveCurrentSettings();
     if(id === "mode") updateModeTargets();
@@ -1214,6 +1254,7 @@ $("playerSelect").onchange=()=>{ updatePlayerUI(); updateModeTargets(); };
 });
 refreshPlayers();
 updateModeTargets();
+updateCustomPaceUI();
 
 $("startBtn").onclick=startTraining;
 $("stopBtn").onclick=finishTraining;
@@ -1238,7 +1279,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev33: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev34: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
