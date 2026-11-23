@@ -129,3 +129,10 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Start-Countdown spielt die Zahlen strikt in Reihenfolge (z. B. 3, 2, 1).
 - Countdown-Audiodateien werden einzeln abgewartet statt über ein Intervall in eine Audio-Warteschlange gelegt.
 - iOS-Sicherheits-Timeout verhindert, dass der Countdown bei fehlendem Audio-Ende hängen bleibt.
+
+
+## dev32
+- Split-Step-Signalton und Eckansage ohne künstliche Zwischenpause; die Ecke wird erst beim Signal bekannt.
+- Rücklauf zur Mitte und Bereitschaftszeit bleiben vor dem nächsten Signal.
+- Eckpunkte des Einzelfeldes näher an die Einzel-Seitenlinien verschoben; Mini-Vorschau angepasst.
+- Keine Kamerafunktion.

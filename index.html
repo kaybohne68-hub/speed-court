@@ -221,13 +221,13 @@
     }
     .court .center-line,.court .service1,.court .service2{display:none!important}
     .net-line{left:0!important;right:0!important;top:1.5%!important;height:4px!important;z-index:3!important}
-    /* Laufpunkte vollständig innerhalb der Linien */
-    .nvl{left:15%!important;top:17%!important}.nvr{left:85%!important;top:17%!important}
-    .vl{left:15%!important;top:18%!important}.vr{left:85%!important;top:18%!important}
+    /* dev32: Zielpunkte an den äußeren Einzelfeld-Ecken (Einzel-Seitenlinien bei 7%/93%) */
+    .nvl{left:9%!important;top:7%!important}.nvr{left:91%!important;top:7%!important}
+    .vl{left:9%!important;top:7%!important}.vr{left:91%!important;top:7%!important}
     .ml{left:15%!important;top:52%!important}.mr{left:85%!important;top:52%!important}
-    .hl{left:15%!important;top:76%!important;bottom:auto!important}
-    .hm{left:50%!important;top:76%!important;bottom:auto!important}
-    .hr{left:85%!important;top:76%!important;bottom:auto!important}
+    .hl{left:9%!important;top:93%!important;bottom:auto!important}
+    .hm{left:50%!important;top:93%!important;bottom:auto!important}
+    .hr{left:91%!important;top:93%!important;bottom:auto!important}
     .court .target{z-index:4!important}
 
   </style>
@@ -237,7 +237,7 @@
   <main class="app">
     <header>
       <h1>🏸 Speed Court</h1>
-      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev31</div>
+      <div class="sub">Badminton Sprint & Footwork Trainer · Version 2.0.0-dev32</div>
     </header>
 
     <section id="setup" class="card">
@@ -276,15 +276,15 @@
         <div id="modePreviewTitle" class="mode-preview-title">Laufpunkte dieses Modus</div>
         <div class="mini-court" aria-hidden="true">
           <div class="net-line"></div>
-          <i class="mini-dot" data-mini="nvl" style="left:15%;top:17%"></i>
-          <i class="mini-dot" data-mini="nvr" style="left:85%;top:17%"></i>
-          <i class="mini-dot" data-mini="vl" style="left:15%;top:18%"></i>
-          <i class="mini-dot" data-mini="vr" style="left:85%;top:18%"></i>
+          <i class="mini-dot" data-mini="nvl" style="left:9%;top:7%"></i>
+          <i class="mini-dot" data-mini="nvr" style="left:91%;top:7%"></i>
+          <i class="mini-dot" data-mini="vl" style="left:9%;top:7%"></i>
+          <i class="mini-dot" data-mini="vr" style="left:91%;top:7%"></i>
           <i class="mini-dot" data-mini="ml" style="left:15%;top:52%"></i>
           <i class="mini-dot" data-mini="mr" style="left:85%;top:52%"></i>
-          <i class="mini-dot" data-mini="hl" style="left:15%;top:76%"></i>
-          <i class="mini-dot" data-mini="hm" style="left:50%;top:76%"></i>
-          <i class="mini-dot" data-mini="hr" style="left:85%;top:76%"></i>
+          <i class="mini-dot" data-mini="hl" style="left:9%;top:93%"></i>
+          <i class="mini-dot" data-mini="hm" style="left:50%;top:93%"></i>
+          <i class="mini-dot" data-mini="hr" style="left:91%;top:93%"></i>
         </div>
       </div>
 
@@ -341,7 +341,7 @@
       </div>
 
       <div>
-        <label for="stepDelay">Mitte → Step: <span id="stepDelayVal">0.5</span>s</label>
+        <label for="stepDelay">Mitte → Bereit: <span id="stepDelayVal">0.5</span>s</label>
         <input id="stepDelay" type="range" min="0" max="2" step="0.1" value="0.5">
       </div>
 
@@ -693,22 +693,9 @@ function randomDelay(){
 function cue(){
   if (!state.running) return;
   if (Date.now() >= state.endTs) return finishRound();
-
-  const mode = $("mode").value;
-  if (mode === "split"){
-    $("phase").textContent = "Split-Step!";
-    $("direction").textContent = "SPLIT!";
-    clearActive();
-    beep();
-    vibrate(50);
-    setTimeout(()=>{
-      if (!state.running) return;
-      if (Date.now() >= state.endTs) return finishRound();
-      doDirection();
-    }, 150 + Math.random()*250);
-  } else {
-    doDirection();
-  }
+  // dev32: Split-Step und Zielansage sind ein gemeinsames Ereignis.
+  // Kein gesondertes "Step" und keine Wartezeit vor der Ecke.
+  doDirection();
 }
 
 function doDirection(){
@@ -726,8 +713,8 @@ function doDirection(){
   const el = document.querySelector(`[data-dir="${d.id}"]`);
   if (el) el.classList.add("active");
 
+  beep(); // Split-Step-Signal exakt beim Bekanntgeben der neuen Ecke
   speak(d.label);
-  beep();
   playMediaCue("cue");
   vibrate(90);
 
@@ -767,31 +754,22 @@ function doDirection(){
       clearActive();
       vibrate([30,30,30]);
 
-      // V1.12.2: Nach MITTE folgt nach einer einstellbaren Zeit STEP.
-      // Erst nach STEP beginnt die vorhandene zufällige Reaktionspause.
-      // Audio ist weiterhin nicht der Zeitgeber, damit Bluetooth den Ablauf nicht blockiert.
+      // dev32: Rücklauf abschließen, Bereitschaftszeit abwarten,
+      // erst dann mit einem Signalton UND der neuen Eckansage fortfahren.
       const centerSoundMs = 900;
-      const stepDelayMs = parseFloat($("stepDelay").value) * 1000;
+      const readinessMs = parseFloat($("stepDelay").value) * 1000;
       const reactionPause = lo + Math.random() * (hi - lo);
-
       state.nextTimeout = setTimeout(()=>{
         if (!state.running) return;
-
+        if (Date.now() >= state.endTs) return finishRound();
+        $("phase").textContent = "Bereit";
+        $("direction").textContent = "BEREIT";
         state.nextTimeout = setTimeout(()=>{
           if (!state.running) return;
-          speak("Step", true);
-          $("phase").textContent = "STEP";
-          $("direction").textContent = "STEP";
-          vibrate(45);
-
-          state.nextTimeout = setTimeout(()=>{
-            if (!state.running) return;
-            $("phase").textContent = "Training";
-            if (Date.now() >= state.endTs) return finishRound();
-            cue();
-          }, (Date.now() >= state.endTs ? 60 : reactionPause));
-        }, stepDelayMs);
-      }, centerSoundMs);
+          if (Date.now() >= state.endTs) return finishRound();
+          cue();
+        }, reactionPause);
+      }, centerSoundMs + readinessMs);
     }, centerMs);
   }, targetMs);
 }
@@ -1233,7 +1211,7 @@ $("exitTrainingBtn").onclick=()=>{
 };
 
 
-/* Speed Court 2.0.0-dev31: additions on top of the proven V1.12.2 training engine. */
+/* Speed Court 2.0.0-dev32: additions on top of the proven V1.12.2 training engine. */
 const SC12_EN_AUDIO = {
  "1":"audio/en/1.mp3","2":"audio/en/2.mp3","3":"audio/en/3.mp3","4":"audio/en/4.mp3","5":"audio/en/5.mp3",
  "6":"audio/en/6.mp3","7":"audio/en/7.mp3","8":"audio/en/8.mp3","9":"audio/en/9.mp3","10":"audio/en/10.mp3",
@@ -1359,10 +1337,10 @@ speak=function(text,force=false){
 /* dev20 court positions: applied to actual rendered training dots. */
 function sc20Edges(){
  const map={
-  "Vorne links":[7,7],"Vorne rechts":[93,7],
+  "Vorne links":[9,7],"Vorne rechts":[91,7],
   "Links":[7,50],"Mitte links":[7,50],
   "Rechts":[93,50],"Mitte rechts":[93,50],
-  "Hinten links":[7,93],"Hinten mitte":[50,93],"Hinten rechts":[93,93],
+  "Hinten links":[9,93],"Hinten mitte":[50,93],"Hinten rechts":[91,93],
   "Mitte":[50,50]
  };
  document.querySelectorAll(".dot,.point,.target").forEach(el=>{
