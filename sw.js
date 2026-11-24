@@ -1,4 +1,4 @@
-const CACHE='speed-court-2.0.0-dev36';
-self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./manifest.json'])))});
+const CACHE='speed-court-2.0.0-dev37';
+self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./manifest.json','./audio/split.wav','./audio/de/1.mp3','./audio/de/pause.mp3','./audio/en/back-left.mp3','./audio/en/middle-right.mp3','./audio/en/front-right.mp3','./audio/en/2.mp3','./audio/en/back-center.mp3','./audio/en/go.mp3','./audio/en/4.mp3','./audio/en/6.mp3','./audio/en/step.mp3','./audio/en/7.mp3','./audio/en/back-right.mp3','./audio/en/5.mp3','./audio/en/front-left.mp3','./audio/en/center.mp3','./audio/en/10.mp3','./audio/en/1.mp3','./audio/en/middle-left.mp3','./audio/en/3.mp3','./audio/en/pause.mp3','./audio/en/9.mp3','./audio/en/8.mp3'])))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(fetch(e.request).then(r=>{const x=r.clone();caches.open(CACHE).then(c=>c.put(e.request,x));return r}).catch(()=>caches.match(e.request)))});

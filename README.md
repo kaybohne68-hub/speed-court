@@ -160,9 +160,12 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 - Service-Worker-Cache auf dev35 aktualisiert.
 
 
-## dev36
+## dev37
 - Ta-Damm!-Signal mit stärker betonten Obertönen und dynamischer Begrenzung für bessere Hörbarkeit.
 - Eckansage und sichtbare Zielmarkierung beginnen 160 ms nach „Ta“, beim Start von „Damm“.
 - Systemlautstärke und iOS-/Bluetooth-Lautstärkelimits bleiben bestehen.
 - Split-Lautstärkeregler und individuelle Laufzeitregler bleiben erhalten.
 - Hinweis: Die tatsächliche Sprachstartlatenz hängt vom iPhone ab und muss praktisch geprüft werden.
+
+
+Dev37: ein Web-Audio-Kontext, vorgeladene Aufnahmen, Audio-Test mit Countdown, Abbruch bei erkannten Audiofehlern. iOS-Praxistest erforderlich.
