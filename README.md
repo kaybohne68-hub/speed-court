@@ -169,3 +169,7 @@ Reparaturversion auf Basis der zuletzt nachweislich vollständigen Trainingsengi
 
 
 Dev37: ein Web-Audio-Kontext, vorgeladene Aufnahmen, Audio-Test mit Countdown, Abbruch bei erkannten Audiofehlern. iOS-Praxistest erforderlich.
+
+
+## dev38
+Audioaufnahmen direkt eingebettet; einzelne Dekodierung mit HTML-Audio-Fallback; detaillierte Fehler, Einzeltests und expliziter Bildschirmstart. iOS-Praxistest ausstehend.
